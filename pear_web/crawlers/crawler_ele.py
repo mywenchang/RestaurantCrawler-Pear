@@ -1,17 +1,20 @@
 # coding=utf-8
 
 import requests
+from pear_web.models.restaurant import Restaurant
+from pear_web import db
+from pear_web.utils.const import Source
 
 
 def crawl_ele_restaurants(page_size=24, page_offset=0, latitude='30.64995', longitude='104.18755'):
-    '''
+    """
     爬取饿了么商铺ids
     :param page_size: 每一页数据量
     :param page_offset: 偏移量
     :param latitude: 区域维度 默认为成大范围
     :param longitude: 区域经度 默认为成大范围
     :return:
-    '''
+    """
     url = "https://www.ele.me/restapi/shopping/restaurants"
 
     querystring = {"geohash": "wm6n6gehcuu", "latitude": latitude, "limit": page_size,
@@ -34,7 +37,11 @@ def crawl_ele_restaurants(page_size=24, page_offset=0, latitude='30.64995', long
         return
     list = response.json()
     # TODO 存入数据库
-
+    for item in list:
+        restaurant = Restaurant(name=item.name, source=Source.ELE, arriv_time=1, start_fee=1, send_fee=1,
+                                score=item.rating)
+        db.session.add(restaurant)
+    db.session.commit()
     # 递归查询直到没有数据
     page_size = len(list)
     if page_size < 1:

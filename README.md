@@ -1,7 +1,7 @@
 # 项目结构
 
-http服务:pear_web
-爬虫服务:crawler
+http服务:handlers
+爬虫服务:crawlers
 
 * GET（SELECT）：从服务器取出资源（一项或多项）。
 * POST（CREATE）：在服务器新建一个资源。
