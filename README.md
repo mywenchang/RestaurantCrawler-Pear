@@ -20,3 +20,21 @@ http服务:handlers
 * DELETE /zoos/ID：删除某个动物园
 * GET /zoos/ID/animals：列出某个指定动物园的所有动物
 * DELETE /zoos/ID/animals/ID：删除某个指定动物园的指定动物
+
+## 商家表
+```sql
+CREATE TABLE IF NOT EXISTS `restaurant`(
+	`id` INT(11) UNSIGNED AUTO_INCREMENT,
+	`restaurant_id` INT(11) UNSIGNED,
+	`name` VARCHAR(50) NOT NULL,
+	`source` TINYINT,
+	`sales` INT(11)	UNSIGNED,
+	`arrive_time` INT(4) UNSIGNED,
+	`start_fee` FLOAT UNSIGNED,
+	`send_fee` FLOAT UNSIGNED,
+	`score` FLOAT UNSIGNED,
+	`latitude` VARCHAR(20),
+	`longitude` VARCHAR(20),
+	PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```

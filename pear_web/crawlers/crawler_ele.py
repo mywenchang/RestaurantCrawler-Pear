@@ -1,8 +1,9 @@
 # coding=utf-8
 
 import requests
-from pear_web.models.restaurant import Restaurant
+
 from pear_web import db
+from pear_web.models.restaurant import Restaurant
 from pear_web.utils.const import Source
 
 
@@ -28,7 +29,7 @@ def crawl_ele_restaurants(page_size=24, page_offset=0, latitude='30.64995', long
         'referer': "https://www.ele.me/place/wm6n6gehcuu?latitude={}&longitude={}".format(latitude, longitude),
         'accept-encoding': "gzip, deflate, br",
         'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
-        'cookie': "perf_ssid=l5pxqby9al72st9gqdp0kc4p89afap06_2017-10-13; ubt_ssid=1ysevte3hs2nhl4h1z4bmx4euy9yvv2j_2017-10-13; _utrace=18c18dc9c3b53f1d6a6ba83f168a8510_2017-10-13; eleme__ele_me=02038b5ff8b2aece84f0511134efbd56%3Ae942e185c846cc98c786675bfb0aa287650ad65f; SID=ZfELIJEqG1a53Da7J1Tv93vJBeFrH03w28PA; track_id=1507910287%7C7c2243dac1d2fece4f5aef441e581946afad1b9afdfc71e8b4%7C52226a795ee9108249a2a5c536fc8ba9; USERID=274692274",
+        # 'cookie': "perf_ssid=l5pxqby9al72st9gqdp0kc4p89afap06_2017-10-13; ubt_ssid=1ysevte3hs2nhl4h1z4bmx4euy9yvv2j_2017-10-13; _utrace=18c18dc9c3b53f1d6a6ba83f168a8510_2017-10-13; eleme__ele_me=02038b5ff8b2aece84f0511134efbd56%3Ae942e185c846cc98c786675bfb0aa287650ad65f; SID=ZfELIJEqG1a53Da7J1Tv93vJBeFrH03w28PA; track_id=1507910287%7C7c2243dac1d2fece4f5aef441e581946afad1b9afdfc71e8b4%7C52226a795ee9108249a2a5c536fc8ba9; USERID=274692274",
         'cache-control': "no-cache",
     }
 
@@ -36,10 +37,19 @@ def crawl_ele_restaurants(page_size=24, page_offset=0, latitude='30.64995', long
     if response.status_code != requests.codes.ok:
         return
     list = response.json()
-    # TODO 存入数据库
     for item in list:
-        restaurant = Restaurant(name=item.name, source=Source.ELE, arriv_time=1, start_fee=1, send_fee=1,
-                                score=item.rating)
+        restaurant = Restaurant(
+            restaurant_id=item.get('id'),
+            name=item.get('name'),
+            source=Source.ELE,
+            arrive_time=item.get('order_lead_time'),
+            start_fee=item.get('float_minimum_order_amount'),
+            send_fee=item.get('float_delivery_fee'),
+            score=item.get('rating'),
+            sales=item.get('recent_order_num'),
+            latitude=item.get('latitude'),
+            longitude=item.get('longitude')
+        )
         db.session.add(restaurant)
     db.session.commit()
     # 递归查询直到没有数据
@@ -48,3 +58,23 @@ def crawl_ele_restaurants(page_size=24, page_offset=0, latitude='30.64995', long
         return
     page_offset += page_size
     crawl_ele_restaurants(page_size, page_offset)
+
+
+def crawl_ele_dishes(restaurant_id, latitude, longitude):
+    url = "https://www.ele.me/restapi/shopping/v2/menu"
+
+    querystring = {"restaurant_id": restaurant_id}
+
+    headers = {
+        'accept': "application/json, text/plain, */*",
+        'x-shard': "shopid={};loc={},{}".format(restaurant_id, latitude, longitude),
+        'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36",
+        'referer': "https://www.ele.me/shop/{}".format(restaurant_id),
+        'accept-encoding': "gzip, deflate, br",
+        'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
+        # 'cookie': "perf_ssid=l5pxqby9al72st9gqdp0kc4p89afap06_2017-10-13; ubt_ssid=1ysevte3hs2nhl4h1z4bmx4euy9yvv2j_2017-10-13; _utrace=18c18dc9c3b53f1d6a6ba83f168a8510_2017-10-13; eleme__ele_me=02038b5ff8b2aece84f0511134efbd56%3Ae942e185c846cc98c786675bfb0aa287650ad65f; SID=ZfELIJEqG1a53Da7J1Tv93vJBeFrH03w28PA; USERID=274692274; track_id=1507910287%7C7c2243dac1d2fece4f5aef441e581946afad1b9afdfc71e8b4%7C52226a795ee9108249a2a5c536fc8ba9; perf_ssid=l5pxqby9al72st9gqdp0kc4p89afap06_2017-10-13; ubt_ssid=1ysevte3hs2nhl4h1z4bmx4euy9yvv2j_2017-10-13; _utrace=18c18dc9c3b53f1d6a6ba83f168a8510_2017-10-13; eleme__ele_me=02038b5ff8b2aece84f0511134efbd56%3Ae942e185c846cc98c786675bfb0aa287650ad65f; SID=ZfELIJEqG1a53Da7J1Tv93vJBeFrH03w28PA; track_id=1507910287%7C7c2243dac1d2fece4f5aef441e581946afad1b9afdfc71e8b4%7C52226a795ee9108249a2a5c536fc8ba9; firstEnterUrlInSession=https%3A//www.ele.me/shop/1525314; pageReferrInSession=https%3A//www.ele.me/place/wm6n6gehcuu%3Flatitude%3D30.64995%26longitude%3D104.18755; USERID=274692274",
+        'cache-control': "no-cache",
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    dishes = response.json()

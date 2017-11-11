@@ -1,7 +1,12 @@
+# coding=utf-8
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:jiang147852@localhost/db_pear'
+
+# SqlAlchemy配置
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:jiyang147852@localhost/db_pear'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
 from pear_web.handlers import crawler, data_analyse
