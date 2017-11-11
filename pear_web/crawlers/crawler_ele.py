@@ -3,6 +3,7 @@
 import requests
 
 from pear_web import db
+from pear_web.models.dish import Dish
 from pear_web.models.restaurant import Restaurant
 from pear_web.utils.const import Source
 
@@ -77,4 +78,18 @@ def crawl_ele_dishes(restaurant_id, latitude, longitude):
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
+    if response.status_code != requests.codes.ok:
+        return
     dishes = response.json()
+    for item in dishes:
+        foods = item.get('foods')
+        for item in foods:
+            dish = Dish(
+                name=item.get('name'),
+                restaurant_id=item.get('restaurant_id'),
+                rating=item.get('rating'),
+                month_sales=item.get('month_sales'),
+                rating_count=item.get('rating_count')
+            )
+            db.session.add(dish)
+        db.session.commit()
