@@ -53,3 +53,19 @@ CREATE TABLE IF NOT EXISTS `dish` (
   KEY `idx_restaurant_id` (`restaurant_id`)
 )ENGINE = InnoDB DEFAULT CHARSET = utf8;
 ```
+
+## API
+
+* 新建爬虫
+```json
+//爬取饿了么成都大学附近的商家信息
+{
+  "action": "create",
+  "type": "restaurant",
+  "source": "ele",
+  "extras": {
+    "latitude": "35.12412",
+    "longitude": "104.129401"
+  }
+}
+```
