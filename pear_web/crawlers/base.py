@@ -5,9 +5,10 @@ from datetime import datetime
 from pear_web import db
 from pear_web.models.crawler import Crawler
 from pear_web.utils.const import Crawler_Status
+from multiprocessing import Process
 
 
-class BaseCrawler(object):
+class BaseCrawler(Process):
     def __init__(self, args):
         super(BaseCrawler, self).__init__()
         args = json.dumps(args)
@@ -46,3 +47,6 @@ class BaseCrawler(object):
         """
         self.crawler.data_count = count
         db.session.commit()
+
+    def run(self):
+        self.crawl()

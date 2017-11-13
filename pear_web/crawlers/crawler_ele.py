@@ -2,8 +2,8 @@
 
 import requests
 
-from pear_web.crawlers.base import BaseCrawler
 from pear_web import db
+from pear_web.crawlers.base import BaseCrawler
 from pear_web.models.dish import Dish
 from pear_web.models.restaurant import Restaurant
 from pear_web.utils.const import Source
@@ -42,7 +42,6 @@ class CrawlEleRestaurants(BaseCrawler):
 
     def crawl(self):
         response = requests.request("GET", self.url, headers=self.headers, params=self.querystring)
-        print self.querystring
         if response.status_code != requests.codes.ok:
             self.error('status_code != 200')
             return

@@ -7,9 +7,6 @@ from pear_web import app
 from pear_web.crawlers import Crawlers
 from pear_web.models.crawler import Crawler
 from pear_web.utils.const import SUPPORT_ACTIONS
-import multiprocessing
-
-pool = multiprocessing.Pool(3)
 
 
 @app.route('/crawlers', methods=['GET', 'POST'])
@@ -19,7 +16,7 @@ def crawlers(crawler_id=None):
     if request.method == 'GET':
         # 爬虫信息
         if crawler_id:
-            crawler = Crawler.query.get_or_404(crawler_id)
+            crawler = Crawler.query.get(crawler_id)
             return jsonify(crawler.to_dict())
         else:
             crawlers = Crawler.query.all()
@@ -30,10 +27,11 @@ def crawlers(crawler_id=None):
             source = request.form.get('source')
             action = _wrap_action(action, source, type)
             if action not in SUPPORT_ACTIONS:
-                abort(404)
-            # 新建一个爬虫
-            pool.apply_async(create_crawler, (action, request.form))
+                abort(400)
+            crawler = Crawlers[action](request.form)
+            crawler.start()
             return jsonify({'status': 'ok'})
+
         return 'post'
     elif request.method == 'PUT':
         # 更新某个爬虫信息(提供该爬虫所有信息)
@@ -49,8 +47,3 @@ def crawlers(crawler_id=None):
 
 def _wrap_action(action, source, type):
     return '{}_{}_{}_crawler'.format(action, source, type)
-
-
-def create_crawler(action, args):
-    crawler = Crawlers[action](args)
-    crawler.crawl()

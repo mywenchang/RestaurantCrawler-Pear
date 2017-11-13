@@ -25,11 +25,11 @@ class Crawler(db.Model):
         return {
             'id': self.id,
             'status': self.status,
-            'created': self.created.isoformat() if isinstance(self.created, datetime) else '',
+            'created': self.created.strftime('%Y-%m-%d %H:%M:%S') if isinstance(self.created, datetime) else '',
             'finished': self.finished.isoformat() if isinstance(self.finished, datetime) else '',
-            'args': json.loads(self.args),
+            'args': json.loads(self.args) if self.args else '',
             'info': self.info,
-            'extras': json.loads(self.extras),
+            'extras': json.loads(self.extras) if self.extras else '',
             'data_count': self.data_count,
             'total': self.total
         }
