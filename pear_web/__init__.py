@@ -2,11 +2,14 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from pear_web.utils.confg import config
 
 app = Flask(__name__)
 
 # SqlAlchemy配置
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:jiyang147852@localhost/db_pear'
+mysql_conf = config['mysql']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{user}:{password}@{host}/{database}'.format(
+    user=mysql_conf['user'], password=mysql_conf['password'], host=mysql_conf['host'], database=mysql_conf['database'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
