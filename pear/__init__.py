@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from pear_web.utils.confg import config
+from pear.utils.confg import config
 
 app = Flask(__name__)
 
@@ -13,4 +13,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://{user}:{password}@{host
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from pear_web.handlers import crawler, data_analyse
+from pear.handlers import crawler, data_analyse

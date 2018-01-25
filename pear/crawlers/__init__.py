@@ -1,6 +1,6 @@
 # coding=utf-8
 
-from pear_web.crawlers import crawler_ele
+from pear.crawlers import crawler_ele
 
 Crawlers = dict({
     'create_ele_restaurant_crawler': crawler_ele.CrawlEleRestaurants,

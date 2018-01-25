@@ -1,5 +1,5 @@
 # coding=utf-8
-from pear_web import db
+from pear import db
 
 
 class Dish(db.Model):

@@ -1,5 +1,5 @@
 # coding=utf-8
-from pear_web import app
+from pear import app
 from flask.app import request
 
 

@@ -1,8 +1,8 @@
 import json
 
-from pear_web import db
+from pear import db
 from datetime import datetime
-from pear_web.utils.const import Crawler_Status
+from pear.utils.const import Crawler_Status
 
 
 class Crawler(db.Model):

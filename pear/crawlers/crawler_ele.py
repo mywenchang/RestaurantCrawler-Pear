@@ -2,11 +2,11 @@
 
 import requests
 
-from pear_web import db
-from pear_web.crawlers.base import BaseCrawler
-from pear_web.models.dish import Dish
-from pear_web.models.restaurant import Restaurant
-from pear_web.utils.const import Source
+from pear import db
+from pear.crawlers.base import BaseCrawler
+from pear.models.dish import Dish
+from pear.models.restaurant import Restaurant
+from pear.utils.const import Source
 
 
 class CrawlEleRestaurants(BaseCrawler):

@@ -3,10 +3,10 @@
 from flask import abort, jsonify
 from flask.app import request
 
-from pear_web import app
-from pear_web.crawlers import Crawlers
-from pear_web.models.crawler import Crawler
-from pear_web.utils.const import SUPPORT_ACTIONS
+from pear import app
+from pear.crawlers import Crawlers
+from pear.models.crawler import Crawler
+from pear.utils.const import SUPPORT_ACTIONS
 
 
 @app.route('/crawlers', methods=['GET', 'POST'])

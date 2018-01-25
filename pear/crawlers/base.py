@@ -2,9 +2,9 @@
 import json
 from datetime import datetime
 
-from pear_web import db
-from pear_web.models.crawler import Crawler
-from pear_web.utils.const import Crawler_Status
+from pear import db
+from pear.models.crawler import Crawler
+from pear.utils.const import Crawler_Status
 from multiprocessing import Process
 
 
