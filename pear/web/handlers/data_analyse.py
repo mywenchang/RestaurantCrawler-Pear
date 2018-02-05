@@ -1,10 +1,12 @@
 # coding=utf-8
-from pear import app
+from flask import Blueprint
 from flask.app import request
 
+data_router = Blueprint('analyse', __name__)
 
-@app.route('/analyse', methods=['GET', 'POST'])
-@app.route('/analyse/<int:analyse_id>', methods=['GET', 'POST'])
+
+@data_router.route('/', methods=['GET', 'POST'])
+@data_router.route('/<int:analyse_id>', methods=['GET', 'POST'])
 def analyse(analyse_id=None):
     if request.method == 'GET':
         return 'get'

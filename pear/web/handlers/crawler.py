@@ -1,16 +1,17 @@
 # coding=utf-8
 
-from flask import abort, jsonify
+from flask import abort, jsonify, Blueprint
 from flask.app import request
 
-from pear import app
 from pear.crawlers import Crawlers
-from pear.models.crawler import Crawler
+from pear.models.crawler import CrawlerDao
 from pear.utils.const import SUPPORT_ACTIONS
 
+crawlers_router = Blueprint('crawlers', __name__)
 
-@app.route('/crawlers', methods=['GET', 'POST'])
-@app.route('/crawlers/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+
+@crawlers_router.route('/', methods=['GET', 'POST'])
+@crawlers_router.route('/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def crawlers(crawler_id=None):
     action = request.form.get('action')
     if request.method == 'GET':

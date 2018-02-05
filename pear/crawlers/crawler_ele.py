@@ -1,23 +1,25 @@
 # coding=utf-8
+import json
 
 import requests
 
-from pear import db
 from pear.crawlers.base import BaseCrawler
-from pear.models.dish import Dish
-from pear.models.restaurant import Restaurant
+# from pear.models.dish import Dish
+# from pear.models.restaurant import Restaurant
 from pear.utils.const import Source
 
 
 class CrawlEleRestaurants(BaseCrawler):
-    def __init__(self, args):
+    def __init__(self, args=None):
         super(CrawlEleRestaurants, self).__init__(args)
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0
-        if args.get('extras'):
-            self.latitude = args.get('extras').get('latitude', 30.64995)
-            self.longitude = args.get('extras').get('longitude', 104.18755)
+        if args:
+            args = json.loads(args)
+            if args.get('extras'):
+                self.latitude = args.get('extras').get('latitude', 30.64995)
+                self.longitude = args.get('extras').get('longitude', 104.18755)
         else:
             self.latitude = '30.64995'
             self.longitude = '104.18755'
@@ -46,21 +48,21 @@ class CrawlEleRestaurants(BaseCrawler):
             self.error('status_code != 200')
             return
         list = response.json()
-        for item in list:
-            restaurant = Restaurant(
-                restaurant_id=item.get('id'),
-                name=item.get('name'),
-                source=Source.ELE,
-                arrive_time=item.get('order_lead_time'),
-                start_fee=item.get('float_minimum_order_amount'),
-                send_fee=item.get('float_delivery_fee'),
-                score=item.get('rating'),
-                sales=item.get('recent_order_num'),
-                latitude=item.get('latitude'),
-                longitude=item.get('longitude')
-            )
-            db.session.add(restaurant)
-        db.session.commit()
+        # for item in list:
+        #     restaurant = Restaurant(
+        #         restaurant_id=item.get('id'),
+        #         name=item.get('name'),
+        #         source=Source.ELE,
+        #         arrive_time=item.get('order_lead_time'),
+        #         start_fee=item.get('float_minimum_order_amount'),
+        #         send_fee=item.get('float_delivery_fee'),
+        #         score=item.get('rating'),
+        #         sales=item.get('recent_order_num'),
+        #         latitude=item.get('latitude'),
+        #         longitude=item.get('longitude')
+        #     )
+        #     db.session.add(restaurant)
+        # db.session.commit()
         # 递归查询直到没有数据
         data_size = len(list)
         if data_size < 1:
@@ -107,15 +109,15 @@ class CrawlEleDishes(BaseCrawler):
         for item in dishes:
             foods = item.get('foods')
             for item in foods:
-                dish = Dish(
-                    name=item.get('name'),
-                    restaurant_id=item.get('restaurant_id'),
-                    rating=item.get('rating'),
-                    month_sales=item.get('month_sales'),
-                    rating_count=item.get('rating_count')
-                )
-                db.session.add(dish)
+                # dish = Dish(
+                #     name=item.get('name'),
+                #     restaurant_id=item.get('restaurant_id'),
+                #     rating=item.get('rating'),
+                #     month_sales=item.get('month_sales'),
+                #     rating_count=item.get('rating_count')
+                # )
+                # db.session.add(dish)
                 total += 1
                 self.update_count(total)
-            db.session.commit()
+                # db.session.commit()
         self.done(total)

@@ -1,35 +1,41 @@
-import json
+# coding=utf-8
 
-from pear import db
 from datetime import datetime
+from sqlalchemy import update, select
+
+from pear.models.tables import crawler, engine
 from pear.utils.const import Crawler_Status
 
 
-class Crawler(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.Integer)
-    created = db.Column(db.DateTime)
-    finished = db.Column(db.DateTime)
-    args = db.Column(db.String)
-    info = db.Column(db.String)
-    extras = db.Column(db.String)
-    data_count = db.Column(db.Integer)
-    total = db.Column(db.Integer)
+class CrawlerDao(object):
+    conn = engine.connect()
 
-    def __init__(self, created=None, args=None):
-        self.created = created
-        self.args = args
-        self.status = Crawler_Status.Crawling
+    @classmethod
+    def create(cls, args, info=None, extra=None):
+        sql = crawler.insert().values(
+            status=Crawler_Status.Crawling,
+            created=datetime.now()
+        )
+        if args is not None:
+            sql = sql.insert().values(args=args)
+        if extra is not None:
+            sql = sql.insert().values(extra=extra)
+        return cls.conn.execute(sql)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'status': self.status,
-            'created': self.created.strftime('%Y-%m-%d %H:%M:%S') if isinstance(self.created, datetime) else '',
-            'finished': self.finished.isoformat() if isinstance(self.finished, datetime) else '',
-            'args': json.loads(self.args) if self.args else '',
-            'info': self.info,
-            'extras': json.loads(self.extras) if self.extras else '',
-            'data_count': self.data_count,
-            'total': self.total
-        }
+    @classmethod
+    def update_by_id(cls, crawler_id, status=None, total=None, finished=None):
+        sql = update(crawler).where(crawler.c.id == crawler_id)
+        if status is not None:
+            sql = sql.values(status=status)
+        if total is not None:
+            sql = sql.values(total=total)
+        if finished is not None:
+            sql = sql.values(finished=finished)
+        cls.conn.execute(sql)
+
+    @classmethod
+    def get_by_id(cls, crawler_id, status=None):
+        sql = select(crawler).where(crawler.c.id == crawler_id)
+        if status is not None:
+            sql = sql.where(crawler.c.status == status)
+        return cls.conn.execute(sql)

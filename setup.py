@@ -13,11 +13,11 @@ setup(
         "requests",
         "flask",
         "sqlalchemy",
-        "flask_sqlalchemy",
+        "pymysql"
     ],
     entry_points={
         'console_scripts': [
-
-        ],
+            'pear_web = pear.web.app:main'
+        ]
     }
 )
