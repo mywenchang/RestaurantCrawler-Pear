@@ -1,8 +1,15 @@
 # coding=utf-8
 
+import logging
+
 from flask import Flask
 
 app = Flask(__name__)
+
+
+@app.route("/check_health", methods=["GET"])
+def check_health():
+    return 'OK'
 
 
 def install_modules(app):
@@ -14,6 +21,7 @@ def install_modules(app):
 
 def init_app():
     install_modules(app)
+    logging.basicConfig(format='%(asctime)-15s %(message)s', level=logging.INFO)
     return app
 
 

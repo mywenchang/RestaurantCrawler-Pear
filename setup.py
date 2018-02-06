@@ -13,11 +13,14 @@ setup(
         "requests",
         "flask",
         "sqlalchemy",
-        "pymysql"
+        "pymysql",
+        "beanstalkc",
+        "PyYAML"
     ],
     entry_points={
         'console_scripts': [
-            'pear_web = pear.web.app:main'
+            'pear_web = pear.web.app:main',
+            'job_queue = pear.jobs.job_queue:main'
         ]
     }
 )

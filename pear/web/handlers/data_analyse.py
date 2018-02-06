@@ -2,7 +2,7 @@
 from flask import Blueprint
 from flask.app import request
 
-data_router = Blueprint('analyse', __name__)
+data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
 
 
 @data_router.route('/', methods=['GET', 'POST'])

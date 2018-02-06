@@ -2,11 +2,7 @@
 import json
 
 import requests
-
 from pear.crawlers.base import BaseCrawler
-# from pear.models.dish import Dish
-# from pear.models.restaurant import Restaurant
-from pear.utils.const import Source
 
 
 class CrawlEleRestaurants(BaseCrawler):

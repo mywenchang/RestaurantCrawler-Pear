@@ -2,7 +2,7 @@
 from sqlalchemy import Table, create_engine, MetaData
 from pear.utils.config import MYSQL_CONFIG
 
-engine = create_engine(MYSQL_CONFIG, convert_unicode=True)
+engine = create_engine(MYSQL_CONFIG, convert_unicode=True, echo=False)
 metadata = MetaData(bind=engine)
 
 crawler = Table('crawler', metadata, autoload=True)

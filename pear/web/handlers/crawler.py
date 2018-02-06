@@ -1,39 +1,39 @@
 # coding=utf-8
+import logging
 
-from flask import abort, jsonify, Blueprint
+from flask import jsonify, Blueprint
 from flask.app import request
-
-from pear.crawlers import Crawlers
 from pear.models.crawler import CrawlerDao
-from pear.utils.const import SUPPORT_ACTIONS
+from pear.web.controller.crawler_controller import start_crawl
 
-crawlers_router = Blueprint('crawlers', __name__)
+crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
+
+logger = logging.getLogger('')
 
 
-@crawlers_router.route('/', methods=['GET', 'POST'])
+@crawlers_router.route('', methods=['GET', 'POST'])
 @crawlers_router.route('/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def crawlers(crawler_id=None):
-    action = request.form.get('action')
+    logger.info(request.form)
     if request.method == 'GET':
         # 爬虫信息
         if crawler_id:
-            crawler = Crawler.query.get(crawler_id)
+            crawler = CrawlerDao.get_by_id(crawler_id)
             return jsonify(crawler.to_dict())
         else:
-            crawlers = Crawler.query.all()
+            page = request.form.get('page', 1)
+            per_page = request.form.get('per_page', 20)
+            status = request.form.get('status', None)
+            crawlers = CrawlerDao.batch_get_by_status(page=page, per_page=per_page, status=status)
             return jsonify([item.to_dict() for item in crawlers])
     elif request.method == 'POST':
+        action = request.form.get('action')
         if action == 'create':
-            type = request.form.get('type')
             source = request.form.get('source')
-            action = _wrap_action(action, source, type)
-            if action not in SUPPORT_ACTIONS:
-                abort(400)
-            crawler = Crawlers[action](request.form)
-            crawler.start()
+            type = request.form.get('type')
+            args = request.form.get('args')
+            start_crawl.deque(source=source, type=type, action=action, args=args)
             return jsonify({'status': 'ok'})
-
-        return 'post'
     elif request.method == 'PUT':
         # 更新某个爬虫信息(提供该爬虫所有信息)
         return 'put'
@@ -44,7 +44,3 @@ def crawlers(crawler_id=None):
         # 删除某个爬虫
         return 'delete'
     return 'crawler'
-
-
-def _wrap_action(action, source, type):
-    return '{}_{}_{}_crawler'.format(action, source, type)
