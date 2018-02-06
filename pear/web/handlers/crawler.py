@@ -31,7 +31,7 @@ def crawlers(crawler_id=None):
             source = request.form.get('source')
             type = request.form.get('type')
             args = request.form.get('args')
-            start_crawl(source=source, type=type, action=action, args=args)
+            start_crawl.enqueue(source=source, type=type, action=action, args=args)
             return jsonify({'status': 'ok'})
     elif request.method == 'PUT':
         # 更新某个爬虫信息(提供该爬虫所有信息)

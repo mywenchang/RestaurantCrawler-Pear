@@ -43,7 +43,7 @@ class Putter(object):
     def __call__(self, *args, **kwargs):
         return self.func(*args, **kwargs)
 
-    def deque(self, *args, **kwargs):
+    def enqueue(self, *args, **kwargs):
         msg = {
             'func_name': self.func.__name__,
             'args': args,
