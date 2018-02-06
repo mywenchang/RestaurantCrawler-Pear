@@ -14,7 +14,6 @@ logger = logging.getLogger('')
 @crawlers_router.route('', methods=['GET', 'POST'])
 @crawlers_router.route('/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 def crawlers(crawler_id=None):
-    logger.info(request.form)
     if request.method == 'GET':
         # 爬虫信息
         if crawler_id:
@@ -32,7 +31,7 @@ def crawlers(crawler_id=None):
             source = request.form.get('source')
             type = request.form.get('type')
             args = request.form.get('args')
-            start_crawl.deque(source=source, type=type, action=action, args=args)
+            start_crawl(source=source, type=type, action=action, args=args)
             return jsonify({'status': 'ok'})
     elif request.method == 'PUT':
         # 更新某个爬虫信息(提供该爬虫所有信息)
