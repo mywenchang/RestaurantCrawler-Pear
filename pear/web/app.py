@@ -4,10 +4,13 @@ import logging
 
 from flask import Flask
 
+from pear.utils.config import IS_DEBUG
+
 app = Flask(__name__)
+logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
 
 
-@app.route("/check_health", methods=["GET"])
+@app.route("/", methods=["GET"])
 def check_health():
     return 'OK'
 
@@ -21,10 +24,10 @@ def install_modules(app):
 
 def init_app():
     install_modules(app)
-    logging.basicConfig(format='%(asctime)-15s %(message)s', level=logging.INFO)
     return app
 
 
 def main():
     init_app()
-    app.run(debug=True)
+    app.logger.info('e12')
+    app.run(debug=IS_DEBUG)

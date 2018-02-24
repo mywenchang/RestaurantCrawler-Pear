@@ -1,8 +1,13 @@
 # coding=utf-8
 import json
+import logging
 
 import requests
+
 from pear.crawlers.base import BaseCrawler
+from pear.utils.const import Source
+
+logger = logging.getLogger('')
 
 
 class CrawlEleRestaurants(BaseCrawler):
@@ -11,63 +16,78 @@ class CrawlEleRestaurants(BaseCrawler):
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0
+        self.latitude = 30.64995
+        self.longitude = 104.18755
+        self.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36'
+        self.sign = '1509166638215'
+        self.geohash = 'wm6n6gehcuu'
         if args:
             args = json.loads(args)
-            if args.get('extras'):
-                self.latitude = args.get('extras').get('latitude', 30.64995)
-                self.longitude = args.get('extras').get('longitude', 104.18755)
-        else:
-            self.latitude = '30.64995'
-            self.longitude = '104.18755'
+            if args.get('latitude'):
+                self.latitude = args.get('latitude')
+            if args.get('longitude'):
+                self.longitude = args.get('longitude')
+            if args.get('user-agent'):
+                self.user_agent = args.get('user_agent')
+            if args.get('sign'):
+                self.sign = args.get('sign')
+            if args.get('geohash'):
+                self.geohash = args.get('geohash')
+        self.referer = "https://www.ele.me/place/{}?latitude={}&longitude={}".format(self.geohash, self.latitude, self.longitude)
         self.headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "loc={},{}".format(self.longitude, self.latitude),
-            'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36",
-            'referer': "https://www.ele.me/place/wm6n6gehcuu?latitude={}&longitude={}".format(self.latitude,
-                                                                                              self.longitude),
+            'user-agent': self.user_agent,
+            'referer': self.referer,
             'accept-encoding': "gzip, deflate, br",
             'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
             'cache-control': "no-cache",
         }
-        self.querystring = {"geohash": "wm6n6gehcuu", "latitude": self.latitude, "limit": self.page_size,
-                            "longitude": self.longitude, "offset": self.page_offset, "sign": "1509166638215",
+        self.querystring = {"geohash": self.geohash,
+                            "latitude": self.latitude,
+                            "limit": self.page_size,
+                            "longitude": self.longitude,
+                            "offset": self.page_offset,
+                            "sign": self.sign,
                             "terminal": "web"}
         extras = {
             "headers": self.headers,
             "query": self.querystring
         }
-        self.insert_extras(extras)
+        self.insert_extras(json.dumps(extras))
 
-    def crawl(self):
-        response = requests.request("GET", self.url, headers=self.headers, params=self.querystring)
-        if response.status_code != requests.codes.ok:
-            self.error('status_code != 200')
-            return
-        list = response.json()
-        # for item in list:
-        #     restaurant = Restaurant(
-        #         restaurant_id=item.get('id'),
-        #         name=item.get('name'),
-        #         source=Source.ELE,
-        #         arrive_time=item.get('order_lead_time'),
-        #         start_fee=item.get('float_minimum_order_amount'),
-        #         send_fee=item.get('float_delivery_fee'),
-        #         score=item.get('rating'),
-        #         sales=item.get('recent_order_num'),
-        #         latitude=item.get('latitude'),
-        #         longitude=item.get('longitude')
-        #     )
-        #     db.session.add(restaurant)
-        # db.session.commit()
-        # 递归查询直到没有数据
-        data_size = len(list)
-        if data_size < 1:
-            self.done(self.page_offset)
-            return
-        self.page_offset += data_size
-        self.querystring['offset'] = self.page_offset
-        self.update_count(self.page_offset)
-        self.crawl()
+
+def crawl(self):
+    response = requests.request("GET", self.url, headers=self.headers, params=self.querystring)
+    if response.status_code != requests.codes.ok:
+        self.error(json.dumps(response.json()))
+        self.done(self.page_offset)
+        return
+    data = response.json()
+    for item in data:
+        restaurant_id = item.get('id'),
+        name = item.get('name'),
+        source = Source.ELE,
+        arrive_time = item.get('order_lead_time'),
+        start_fee = item.get('float_minimum_order_amount'),
+        send_fee = item.get('float_delivery_fee'),
+        score = item.get('rating'),
+        sales = item.get('recent_order_num'),
+        latitude = item.get('latitude'),
+        longitude = item.get('longitude')
+        # TODO insert into db
+
+    # 递归查询直到没有数据
+    data_size = len(data)
+    logger.info('crawler page offset:{}'.format(self.page_offset))
+    logger.info('crawler data size:{}'.format(data_size))
+    if data_size < 1:
+        self.done(self.page_offset)
+        return
+    self.page_offset += data_size
+    self.querystring['offset'] = self.page_offset
+    self.update_count(self.page_offset)
+    self.crawl()
 
 
 class CrawlEleDishes(BaseCrawler):

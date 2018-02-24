@@ -3,21 +3,23 @@
 import logging
 
 from pear.crawlers import Crawlers
-from pear.jobs.job_queue import Router
+from pear.jobs.job_queue import JobQueue
 
-router = Router()
 logger = logging.getLogger('')
+
+queue = JobQueue()
 
 
 def _wrap_action(action, source, type):
     return '{}_{}_{}_crawler'.format(action, source, type)
 
 
-@router.job(tube='crawlers')
-def start_crawl(source, type, action, args=None):
+@queue.task('crawlers')
+def create_crawler(action, source, type, args):
     action = _wrap_action(action, source, type)
-    logger.info('crawler_action_{}'.format(action))
     if action not in Crawlers.keys():
+        logger.warn('Not found crawler for action:{}'.format(action))
         return
-    crawler = Crawlers[action]()
+    crawler = Crawlers[action](args)
+    logger.info(crawler)
     crawler.crawl()

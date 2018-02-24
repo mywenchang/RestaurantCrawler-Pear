@@ -8,3 +8,4 @@ config = {
 
 MYSQL_CONFIG = config['mysql']
 BEANSTALK_CONFIG = config['beanstalk']
+IS_DEBUG = False

@@ -1,8 +1,13 @@
 # coding=utf-8
 
+import logging
+
 from datetime import datetime
+
 from pear.models.crawler import CrawlerDao
 from pear.utils.const import Crawler_Status
+
+logger = logging.getLogger('')
 
 
 class BaseCrawler(object):
@@ -13,21 +18,17 @@ class BaseCrawler(object):
         raise NotImplemented
 
     def done(self, total):
-        """
-        爬虫任务结束
-        :param total: 爬取到的总数据
-        """
         CrawlerDao.update_by_id(self.id, status=Crawler_Status.DONE, total=total, finished=datetime.now())
 
     def error(self, info):
-        pass
+        CrawlerDao.update_by_id(self.id, status=Crawler_Status.Error, info=info, finished=datetime.now())
+        logger.error(info)
 
     def insert_extras(self, extras):
-        pass
+        CrawlerDao.update_by_id(self.id, extras=extras)
 
     def update_count(self, count):
-        """
-        更新当前已经爬取的数据量
-        :param count: 当前爬取到的数据量
-        """
-        CrawlerDao.update_by_id(self.id, total=count)
+        CrawlerDao.update_by_id(self.id, data_count=count)
+
+    def __str__(self):
+        return "crawler-{}".format(self.id)
