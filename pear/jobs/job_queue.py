@@ -8,10 +8,10 @@ import beanstalkc
 import signal
 import time
 
-from pear.utils.config import BEANSTALK_CONFIG
 from pear.jobs.utils import import_module_by_str
+from pear.utils.config import BEANSTALK_CONFIG, LOGGING_FORMATTER
 
-logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
+logging.basicConfig(format=LOGGING_FORMATTER, level=logging.INFO)
 logger = logging.getLogger('')
 
 
@@ -24,7 +24,8 @@ class Subscriber(object):
 
 
 class JobQueue(object):
-    def task(self, tube):
+    @classmethod
+    def task(cls, tube):
         def wrapper(func):
             Subscriber(func, tube)
             return Putter(func, tube)
@@ -43,12 +44,16 @@ class Putter(object):
 
     # 推给离线队列
     def put(self, **kwargs):
-        kwargs['func_name'] = self.func.__name__
-        logger.info('put job:{} to queue'.format(kwargs))
+        args = {
+            'func_name': self.func.__name__,
+            'tube': self.tube,
+            'kwargs': kwargs
+        }
+        logger.info('put job:{} to queue'.format(args))
         beanstalk = beanstalkc.Connection(host=BEANSTALK_CONFIG['host'], port=BEANSTALK_CONFIG['port'])
         try:
             beanstalk.use(self.tube)
-            job_id = beanstalk.put(json.dumps(kwargs))
+            job_id = beanstalk.put(json.dumps(args))
             return job_id
         finally:
             beanstalk.close()
@@ -111,29 +116,32 @@ class Worker(object):
                     logger.error("Kicks reach max. Delete the job", extra={'body': message})
                     self.delete_job(job)
 
-    def on_job(self, job):
+    @classmethod
+    def on_job(cls, job):
         start = time.time()
         msg = json.loads(job.body)
+        logger.info(msg)
         tube = msg.get('tube')
         func_name = msg.get('func_name')
         try:
             func = Subscriber.FUN_MAP[tube][func_name]
-            args = msg.get('args')
             kwargs = msg.get('kwargs')
-            func(*args, **kwargs)
-            logger.info(u'{}-{}-{}'.format(func, args, kwargs))
+            func(**kwargs)
+            logger.info(u'{}-{}'.format(func, kwargs))
         except Exception as e:
             logger.error(e.message)
         cost = time.time() - start
         logger.info('{} cost {}s'.format(func_name, cost))
 
-    def delete_job(self, job):
+    @classmethod
+    def delete_job(cls, job):
         try:
             job.delete()
         except beanstalkc.CommandFailed as e:
             logger.warning(e, exc_info=1)
 
-    def bury_job(self, job):
+    @classmethod
+    def bury_job(cls, job):
         try:
             job.bury()
         except beanstalkc.CommandFailed as e:

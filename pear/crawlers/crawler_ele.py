@@ -21,6 +21,15 @@ class CrawlEleRestaurants(BaseCrawler):
         self.user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36'
         self.sign = '1509166638215'
         self.geohash = 'wm6n6gehcuu'
+        self.headers = {
+            'accept': "application/json, text/plain, */*",
+            'x-shard': "loc={},{}".format(self.longitude, self.latitude),
+            'user-agent': self.user_agent,
+            'referer': self.referer,
+            'accept-encoding': "gzip, deflate, br",
+            'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
+            'cache-control': "no-cache"
+        }
         if args:
             args = json.loads(args)
             if args.get('latitude'):
@@ -33,16 +42,13 @@ class CrawlEleRestaurants(BaseCrawler):
                 self.sign = args.get('sign')
             if args.get('geohash'):
                 self.geohash = args.get('geohash')
-        self.referer = "https://www.ele.me/place/{}?latitude={}&longitude={}".format(self.geohash, self.latitude, self.longitude)
-        self.headers = {
-            'accept': "application/json, text/plain, */*",
-            'x-shard': "loc={},{}".format(self.longitude, self.latitude),
-            'user-agent': self.user_agent,
-            'referer': self.referer,
-            'accept-encoding': "gzip, deflate, br",
-            'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
-            'cache-control': "no-cache",
-        }
+            if args.get('cookies'):
+                self.cookies = args.get('cookies',
+                                        {'USERID': '274692274', 'SID': 'DJPjUIwmk1bLeowGPT6y3msqlNn4kKhJHWLA'})
+            if args.get('headers'):
+                self.headers.update(args.get('headers'))
+        self.referer = "https://www.ele.me/place/{}?latitude={}&longitude={}".format(self.geohash, self.latitude,
+                                                                                     self.longitude)
         self.querystring = {"geohash": self.geohash,
                             "latitude": self.latitude,
                             "limit": self.page_size,
@@ -56,38 +62,38 @@ class CrawlEleRestaurants(BaseCrawler):
         }
         self.insert_extras(json.dumps(extras))
 
+    def crawl(self):
+        response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
+                                    cookies=self.cookies)
+        if response.status_code != requests.codes.ok:
+            self.error(json.dumps(response.json()))
+            self.done(self.page_offset)
+            return
+        data = response.json()
+        for item in data:
+            restaurant_id = item.get('id'),
+            name = item.get('name'),
+            source = Source.ELE,
+            arrive_time = item.get('order_lead_time'),
+            start_fee = item.get('float_minimum_order_amount'),
+            send_fee = item.get('float_delivery_fee'),
+            score = item.get('rating'),
+            sales = item.get('recent_order_num'),
+            latitude = item.get('latitude'),
+            longitude = item.get('longitude')
+            # TODO insert into db
 
-def crawl(self):
-    response = requests.request("GET", self.url, headers=self.headers, params=self.querystring)
-    if response.status_code != requests.codes.ok:
-        self.error(json.dumps(response.json()))
-        self.done(self.page_offset)
-        return
-    data = response.json()
-    for item in data:
-        restaurant_id = item.get('id'),
-        name = item.get('name'),
-        source = Source.ELE,
-        arrive_time = item.get('order_lead_time'),
-        start_fee = item.get('float_minimum_order_amount'),
-        send_fee = item.get('float_delivery_fee'),
-        score = item.get('rating'),
-        sales = item.get('recent_order_num'),
-        latitude = item.get('latitude'),
-        longitude = item.get('longitude')
-        # TODO insert into db
-
-    # 递归查询直到没有数据
-    data_size = len(data)
-    logger.info('crawler page offset:{}'.format(self.page_offset))
-    logger.info('crawler data size:{}'.format(data_size))
-    if data_size < 1:
-        self.done(self.page_offset)
-        return
-    self.page_offset += data_size
-    self.querystring['offset'] = self.page_offset
-    self.update_count(self.page_offset)
-    self.crawl()
+        # 递归查询直到没有数据
+        data_size = len(data)
+        logger.info('crawler page offset:{}'.format(self.page_offset))
+        logger.info('crawler data size:{}'.format(data_size))
+        if data_size < 1:
+            self.done(self.page_offset)
+            return
+        self.page_offset += data_size
+        self.querystring['offset'] = self.page_offset
+        self.update_count(self.page_offset)
+        self.crawl()
 
 
 class CrawlEleDishes(BaseCrawler):

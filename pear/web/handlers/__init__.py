@@ -1,3 +1,5 @@
 import logging
 
-logging.basicConfig(format='%(asctime)-15s %(message)s', level=logging.INFO)
+from pear.utils.config import LOGGING_FORMATTER
+
+logging.basicConfig(format=LOGGING_FORMATTER, level=logging.INFO)

@@ -14,7 +14,7 @@ logger = logging.getLogger('')
 
 @crawlers_router.route('', methods=['GET', 'POST'])
 @crawlers_router.route('/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
-def crawlers(crawler_id=None):
+def handle_crawlers(crawler_id=None):
     if request.method == 'GET':
         if crawler_id:
             crawler = CrawlerDao.get_by_id(crawler_id)
@@ -29,13 +29,11 @@ def crawlers(crawler_id=None):
                 'per_page': per_page,
                 'data': [_wrap_result(item) for item in crawlers]})
     elif request.method == 'POST':
-        action = request.form.get('action')
-        if action == 'create':
-            source = request.form.get('source')
-            type = request.form.get('type')
-            args = request.form.get('args')
-            create_crawler.put(action=action, source=source, type=type, args=args)
-            return jsonify({'status': 'ok'})
+        source = request.form.get('source')
+        type = request.form.get('type')
+        args = request.form.get('args')
+        create_crawler.put(action='create', source=source, type=type, args=args)
+        return jsonify({'status': 'ok'})
     elif request.method == 'PUT':
         return 'put'
     elif request.method == 'PATCH':
@@ -43,6 +41,42 @@ def crawlers(crawler_id=None):
     elif request.method == 'DELETE':
         return 'delete'
     return 'crawler'
+
+
+@crawlers_router.route('/configs', methods=['GET'])
+def handel_crawlers_configs():
+    return jsonify({
+        "data": [
+            {
+                "args": [
+                    "headers",
+                    "cookies"
+                ],
+                "type": "restaurant",
+                "name": "饿了么商家",
+                "source": "ele"
+            },
+            {
+                "args": [
+                    "headers",
+                    "cookies"
+                ],
+                "type": "dish",
+                "name": "饿了么商家菜品",
+                "source": "ele"
+            },
+            {
+                "args": [
+                    "headers",
+                    "cookies"
+                ],
+                "type": "restaurant",
+                "name": "美团商家",
+                "source": "meituan"
+            }
+        ],
+        "total": 3
+    })
 
 
 def _wrap_result(item):

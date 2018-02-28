@@ -1,7 +1,20 @@
-# 项目结构
+# 环境要求
 
-http服务:handlers
-爬虫服务:crawlers
+* python 2.X
+* 系统依赖
+    * zc.buildout
+    * beanstalkd
+    * mysql
+
+# 项目结构
+|模块名|文件目录|说明|
+|:---:|:---:|:---:|
+|http服务|web|包含API接口具体实现，基于 Flask Web框架|
+|爬虫实现|crawlers|爬虫的具体实现|
+|爬虫任务执行|jobs|基于消息队列(beanstalkd)的任务调度|
+|数据操作|models|对数据库的 CRUD 操作实现, 基于 Sqlalchemy |
+
+# HTTP 接口说明
 
 * GET（SELECT）：从服务器取出资源（一项或多项）。
 * POST（CREATE）：在服务器新建一个资源。
@@ -11,76 +24,67 @@ http服务:handlers
 * HEAD：获取资源的元数据。
 * OPTIONS：获取信息，关于资源的哪些属性是客户端可以改变的。
 
-## 各方法例子
-* GET /zoos：列出所有动物园
-* POST /zoos：新建一个动物园
-* GET /zoos/ID：获取某个指定动物园的信息
-* PUT /zoos/ID：更新某个指定动物园的信息（提供该动物园的全部信息）
-* PATCH /zoos/ID：更新某个指定动物园的信息（提供该动物园的部分信息）
-* DELETE /zoos/ID：删除某个动物园
-* GET /zoos/ID/animals：列出某个指定动物园的所有动物
-* DELETE /zoos/ID/animals/ID：删除某个指定动物园的指定动物
+## 详细接口
 
-## 商家表
-```sql
-CREATE TABLE `restaurant` (
-	`id` INT(11) UNSIGNED AUTO_INCREMENT,
-	`restaurant_id` INT(11) UNSIGNED COMMENT '商家id，来自数据源',
-	`name` VARCHAR(100) DEFAULT NULL COMMENT '商家名称',
-	`source` TINYINT(1) COMMENT '数据来源',
-	`sales` INT(11) UNSIGNED COMMENT '销量',
-	`arrive_time` INT(4) UNSIGNED COMMENT '平均到达时间',
-	`start_fee` FLOAT UNSIGNED DEFAULT 0 COMMENT '起送费',
-	`send_fee` FLOAT UNSIGNED DEFAULT 0 COMMENT '配送费',
-	`score` FLOAT UNSIGNED DEFAULT 0 COMMENT '评分',
-	`latitude` VARCHAR(20),
-	`longitude` VARCHAR(20),
-	PRIMARY KEY (`id`),
-	KEY `idx_restaurant_id` (`restaurant_id`)
-) ENGINE = InnoDB CHARSET = utf8;
-```
+### 爬虫
 
-## 菜品表
-```sql
-CREATE TABLE `dish` (
-	`id` INT(11) UNSIGNED AUTO_INCREMENT,
-	`restaurant_id` INT(11) UNSIGNED COMMENT 'restaurant 表中的 id',
-	`name` VARCHAR(100)  DEFAULT NULL COMMENT '菜品名称',
-	`rating` FLOAT UNSIGNED  DEFAULT 0 COMMENT '评价',
-	`moth_sales` INT(11) UNSIGNED DEFAULT 0 COMMENT '月销量',
-	`rating_count` INT(11) UNSIGNED  DEFAULT 0 COMMENT '评价数',
-	PRIMARY KEY (`id`),
-	KEY `idx_restaurant_id` (`restaurant_id`)
-) ENGINE = InnoDB CHARSET = utf8;
-```
+#### 获取可用爬虫
 
-### 爬虫表
-```sql
-CREATE TABLE `crawler` (
-	`id` INT(11) UNSIGNED AUTO_INCREMENT,
-	`status` TINYINT(1) DEFAULT 0 COMMENT '任务执行的状态',
-	`created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	`finished` TIMESTAMP NULL DEFAULT NULL,
-	`args` TEXT COMMENT '任务的参数',
-	`info` TEXT,
-	`extras` TEXT,
-	`data_count` INT(11) UNSIGNED DEFAULT 0 COMMENT '当前获取到的数据量',
-	`total` INT(11) UNSIGNED DEFAULT 0 COMMENT '总数据量',
-	PRIMARY KEY (`id`)
-) ENGINE = InnoDB CHARSET = utf8;
-```
+GET `crawlers/configs`
 
-## API
+> 返回所有可用的爬虫配置信息
 
 ```json
-//爬取饿了么成都大学附近的商家信息
 {
-  "action": "create",
-  "type": "restaurant",
-  "source": "ele",
-  "extras": {
-    "latitude": "35.12412",
-    "longitude": "104.129401"
-   }
+    "data": [
+        {
+            "args": [
+                "headers",
+                "cookies"
+            ],
+            "type": "restaurant",
+            "name": "饿了么商家",
+            "source": "ele"
+        },
+        {
+            "args": [
+                "headers",
+                "cookies"
+            ],
+            "type": "dish",
+            "name": "饿了么商家菜品",
+            "source": "ele"
+        },
+        {
+            "args": [
+                "headers",
+                "cookies"
+            ],
+            "type": "restaurant",
+            "name": "美团商家",
+            "source": "meituan"
+        }
+    ],
+    "total": 3
 }
 ```
+#### 执行一个爬虫任务
+
+POST `/crawlers`
+
+参数:
+
+|参数名|类型|说明|必须|
+|:-:|:-:|:-:|:-:|
+|source|String|`crawlers/configs`接口返回|是|
+|type|String|`crawlers/configs`接口返回|是|
+|args|String|常用 HTTP 头信息, headers、cookies 等|否|
+
+#### 修改一个爬虫任务
+
+PATCH `crawlers/<crawler_id>`
+
+参数:
+
+|参数名|类型|说明|必须|
+|:-:|:-:|:-:|:-:|
