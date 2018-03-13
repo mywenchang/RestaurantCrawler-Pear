@@ -9,3 +9,4 @@ develop-eggs/
 *.egg-info/
 .coverage
 nosetests.xml
+.vscode
