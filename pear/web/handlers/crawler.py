@@ -35,7 +35,7 @@ def handle_crawlers(crawler_id=None):
         type = request.form.get('type')
         args = request.form.get('args')
         create_crawler.put(source=source, type=type, args=args)
-        return jsonify({'status': 'ok'})
+        return jsonify({'status': 'ok'}), 202
     elif request.method == 'PUT':
         return 'put'
     elif request.method == 'PATCH':

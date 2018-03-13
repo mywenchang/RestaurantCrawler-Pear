@@ -14,8 +14,7 @@ setup(
         "flask",
         "sqlalchemy",
         "pymysql",
-        "beanstalkc",
-        "PyYAML"
+        "beanstalkc"
     ],
     entry_points={
         'console_scripts': [

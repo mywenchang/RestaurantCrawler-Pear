@@ -1,11 +1,14 @@
 # coding=utf-8
+from functools import wraps
+
 from flask import session, jsonify, request
 
 
 def authorize(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
-        user_name = request.cookies.get('user')
-        name = session.get(user_name)
+        u_id = request.cookies.get('u_id')
+        name = session.get(u_id)
         if not name:
             return jsonify(msg='Need Log'), 401
         return func(*args, **kwargs)

@@ -3,7 +3,6 @@
 import logging
 
 from flask import Flask
-
 from pear.utils.config import IS_DEBUG
 
 app = Flask(__name__)
@@ -26,6 +25,7 @@ def install_modules(app):
 
 def init_app():
     install_modules(app)
+    app.secret_key = "pear_web_secret_key"
     return app
 
 

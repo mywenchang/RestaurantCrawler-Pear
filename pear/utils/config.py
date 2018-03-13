@@ -1,5 +1,5 @@
 config = {
-    'mysql': 'mysql+pymysql://root:jiyang147852@localhost/db_pear',
+    'mysql': 'mysql+pymysql://root:jiyang147852@localhost/db_pear?charset=utf8',
     'beanstalk': {
         'host': '0.0.0.0',
         'port': 11300
