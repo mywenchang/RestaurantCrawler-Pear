@@ -9,3 +9,5 @@ develop-eggs/
 *.egg-info/
 .coverage
 nosetests.xml
+
+imageToSave.png

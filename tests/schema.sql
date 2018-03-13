@@ -40,3 +40,17 @@ CREATE TABLE `crawler` (
 	`total` INT(11) UNSIGNED DEFAULT 0 COMMENT '总数据量',
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARSET = utf8;
+
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+	`id` INT(11) UNSIGNED AUTO_INCREMENT,
+	`created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	`name` varchar(50),
+	`passwd` varchar(16),
+	`email` varchar(50),
+	`mobile` varchar(20),
+	PRIMARY KEY (`id`),
+	KEY `idx_name_passwd` (`name`, `passwd`),
+	KEY `idx_email_passwd` (`email`, `passwd`),
+	KEY `idx_mobile_passwd` (`mobile`, `passwd`)
+) ENGINE = InnoDB CHARSET = utf8;
