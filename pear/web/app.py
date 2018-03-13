@@ -10,7 +10,7 @@ app = Flask(__name__)
 logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
 
 
-@app.route("/", methods=["GET"])
+@app.route("/check_health", methods=["GET"])
 def check_health():
     return 'OK'
 
@@ -18,8 +18,10 @@ def check_health():
 def install_modules(app):
     from pear.web.handlers.crawler import crawlers_router
     from pear.web.handlers.data_analyse import data_router
+    from pear.web.handlers.user import user_router
     app.register_blueprint(crawlers_router)
     app.register_blueprint(data_router)
+    app.register_blueprint(user_router)
 
 
 def init_app():
@@ -29,5 +31,4 @@ def init_app():
 
 def main():
     init_app()
-    app.logger.info('e12')
     app.run(debug=IS_DEBUG)
