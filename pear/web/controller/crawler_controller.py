@@ -19,12 +19,12 @@ def _wrap_action(source, type):
 
 
 @queue.task('crawlers')
-def create_crawler(source, type, args):
+def new_crawler(u_id, source, type, args):
     action = _wrap_action(source, type)
     if action not in Crawlers.keys():
         logger.warn('Not found crawler for action:{}'.format(action))
         return
-    crawler = Crawlers[action](args)
+    crawler = Crawlers[action](u_id, args)
     crawler.crawl()
 
 
@@ -47,15 +47,15 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
         if resp.status_code == 200:
             token = data.get('validate_token', '')
             return True, token
-        logger.error(data)
-        return False, token
+        msg = data
+        return False, token, msg
     except Exception as e:
-        logger.error(e.message)
-    return False, token
+        msg = e.message
+    return False, token, msg
 
 
 def get_captchas(mobile_phone):
-    url = 'https://h5.ele.me/restapi/eus/v3/captchas'
+    url = 'https://www.ele.me/restapi/eus/v3/captchas'
     payload = {
         'captcha_str': mobile_phone
     }
@@ -73,12 +73,12 @@ def get_captchas(mobile_phone):
         logger.error(e.message)
 
 
-def login_ele_by_mobile(mobile_phone, code, token):
+def login_ele_by_mobile(mobile_phone, sms_code, sms_token):
     url = 'https://h5.ele.me/restapi/eus/login/login_by_mobile'
     payload = {
         "mobile": mobile_phone,
-        "validate_code": code,
-        "validate_token": token
+        "validate_code": sms_code,
+        "validate_token": sms_token
     }
     headers = {
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36',
@@ -87,9 +87,8 @@ def login_ele_by_mobile(mobile_phone, code, token):
     }
     try:
         resp = requests.post(url, json=payload, headers=headers)
-        logger.info(resp.content)
         if resp.status_code == 200:
-            return 200, 'ok'
-        return resp.status_code, resp.json()
+            return True, resp.cookies
+        return False, resp.cookies, resp.content
     except Exception as e:
         logger.error(e.message)

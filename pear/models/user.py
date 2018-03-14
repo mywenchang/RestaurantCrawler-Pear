@@ -1,8 +1,9 @@
 # coding=utf-8
 
 from datetime import datetime
-from pear.models.tables import engine, user
 from sqlalchemy import select, or_
+
+from pear.models.tables import engine, user
 
 
 class UserDao(object):
@@ -15,18 +16,16 @@ class UserDao(object):
 
     @classmethod
     def is_exist(cls, name=None, email=None, mobile=None):
-        sql = select([user])
-        if name:
-            sql = sql.where(user.c.name == name)
-        if email:
-            sql = sql.where(user.c.email == email)
-        if mobile:
-            sql = sql.where(user.c.mobile == mobile)
+        sql = select([user]).where(or_(
+            user.c.name == name,
+            user.c.email == email,
+            user.c.mobile == mobile
+        ))
         return cls.conn.execute(sql).first()
 
     @classmethod
-    def get_by_args(cls, passwd, account=None):
-        sql = select([user]).where(user.c.passwd == passwd)
+    def get_by_args(cls, password, account=None):
+        sql = select([user]).where(user.c.passwd == password)
         if account:
             sql = sql.where(
                 or_(
@@ -38,10 +37,10 @@ class UserDao(object):
         return cls.conn.execute(sql).first()
 
     @classmethod
-    def create(cls, name, passwd, email, mobile):
+    def create(cls, name, password, email, mobile):
         sql = user.insert().values(
             name=name,
-            passwd=passwd,
+            passwd=password,
             created=datetime.now()
         )
         if email:

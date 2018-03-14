@@ -11,8 +11,8 @@ logger = logging.getLogger('')
 
 
 class CrawlEleRestaurants(BaseCrawler):
-    def __init__(self, args=None):
-        super(CrawlEleRestaurants, self).__init__(args)
+    def __init__(self, u_id, args=None):
+        super(CrawlEleRestaurants, self).__init__(u_id, args)
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0
@@ -97,8 +97,8 @@ class CrawlEleRestaurants(BaseCrawler):
 
 
 class CrawlEleDishes(BaseCrawler):
-    def __init__(self, args):
-        super(CrawlEleDishes, self).__init__(args)
+    def __init__(self, u_id, args):
+        super(CrawlEleDishes, self).__init__(u_id, args)
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
         self.restaurant_id = args.get('restaurant_id')
         self.latitude = args.get('latitude')

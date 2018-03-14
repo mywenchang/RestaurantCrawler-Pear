@@ -10,4 +10,3 @@ config = {
 MYSQL_CONFIG = config['mysql']
 BEANSTALK_CONFIG = config['beanstalk']
 LOGGING_FORMATTER = config['logging_formatter']
-IS_DEBUG = False

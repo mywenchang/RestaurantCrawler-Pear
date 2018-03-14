@@ -1,72 +1,104 @@
 # coding=utf-8
 import logging
 
-from flask import jsonify, Blueprint, make_response
-from flask.app import request
+from flask import jsonify, Blueprint, request, Response
 
 from pear.models.crawler import CrawlerDao
 from pear.utils.authorize import authorize
-from pear.web.controller.crawler_controller import create_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
+from pear.web.controller.crawler_controller import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
 
 crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
 
 logger = logging.getLogger('')
 
 
-@crawlers_router.route('', methods=['GET', 'POST'])
-@crawlers_router.route('/<int:crawler_id>', methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
+@crawlers_router.route('/<int:crawler_id>', methods=['GET'])
 @authorize
-def handle_crawlers(crawler_id=None):
-    if request.method == 'GET':
-        if crawler_id:
-            crawler = CrawlerDao.get_by_id(crawler_id)
-            return jsonify(_wrap_result(crawler))
-        else:
-            page = request.args.get('page', 1)
-            per_page = request.args.get('per_page', 20)
-            status = request.args.get('status', None)
-            crawlers = CrawlerDao.batch_get_by_status(page=int(page), per_page=int(per_page), status=status)
-            return jsonify({
-                'page': page,
-                'per_page': per_page,
-                'data': [_wrap_result(item) for item in crawlers]})
-    elif request.method == 'POST':
-        source = request.form.get('source')
-        type = request.form.get('type')
-        args = request.form.get('args')
-        create_crawler.put(source=source, type=type, args=args)
-        return jsonify({'status': 'ok'}), 202
-    elif request.method == 'PUT':
-        return 'put'
-    elif request.method == 'PATCH':
-        return 'patch'
-    elif request.method == 'DELETE':
-        return 'delete'
-    return 'crawler'
+def get_crawler(crawler_id=None):
+    u_id = request.cookies.get('u_id')
+    crawler = CrawlerDao.get_by_id(crawler_id, u_id)
+    return jsonify(data=crawler)
 
 
-@crawlers_router.route('/get_ele_code', methods=['POST'])
+@crawlers_router.route('/', methods=['GET'])
 @authorize
-def handle_login_ele():
+def get_crawlers():
+    page = request.args.get('page', 1)
+    per_page = request.args.get('per_page', 20)
+    status = request.args.get('status', None)
+    u_id = request.cookies.get('u_id')
+    crawlers = CrawlerDao.batch_get_by_status(u_id, page=int(page), per_page=int(per_page), status=status)
+    return jsonify({'per_page': per_page, 'data': crawlers})
+
+
+@crawlers_router.route('/', methods=['POST'])
+@authorize
+def create_crawler():
+    source = request.form.get('source')
+    type = request.form.get('type')
+    args = request.form.get('args')
+    u_id = request.cookies.get('u_id')
+    try:
+        new_crawler.put(u_id=u_id, source=source, type=type, args=args)
+    except Exception as e:
+        return jsonify(message=e.message.__str__()), 500
+    return jsonify(message='create crawler success'), 202
+
+
+@crawlers_router.route('/<int:crawler_id>', methods=['PUT'])
+@authorize
+def update_crawler(crawler_id):
+    return jsonify(status="ok")
+
+
+@crawlers_router.route('/<int:crawler_id>', methods=['DELETE'])
+@authorize
+def delete_crawler(crawler_id):
+    return jsonify(status="ok")
+
+
+# ------------------登录饿了么-----------------
+
+"""
+登录饿了么流程:
+ 输入手机号 -> 获取验证码图片 -> 输入验证码图片上字符 -> 获取登录短信验证码 -> 输入短信验证码，登录饿了么-> 获取登录成功的token存储到cookie
+"""
+
+
+# 获取图片验证码
+@crawlers_router.route('/get_ele_pic_code', methods=['GET'])
+@authorize
+def get_pic_code():
+    mobile = request.args.get('mobile')
+    image_base64, image_token = get_captchas(mobile)
+    return jsonify(image_base64=image_base64, image_token=image_token)
+
+
+# 输入图片验证码字符，然后获取短信验证码
+@crawlers_router.route('/get_sms_code', methods=['GET'])
+@authorize
+def get_sms_code():
+    mobile = request.args.get('mobile')
+    pic_code = request.args.get('pic_code')
+    image_token = request.args.get('image_token')
+    success, sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
+    return jsonify(success=success, sms_token=sms_token, message=msg)
+
+
+# 输入短信验证码登录
+@crawlers_router.route('/login_ele', methods=['POST'])
+@authorize
+def login_ele():
     mobile = request.json.get('mobile')
-    logger.info('mobile:{}'.format(mobile))
-    success, token = get_ele_msg_code(mobile)
-    if not success:
-        c_image, c_hash = get_captchas(mobile)
-        c_value = '验证码'
-        logger.info(c_value)
-        success, token = get_ele_msg_code(mobile, captcha_value=c_value, captch_hash=c_hash)
-    resp = make_response(jsonify({'status': 'ok'}))
-    resp.set_cookie(mobile, token)
-    return resp
-
-
-@crawlers_router.route('/login_ele_by_mobile', methods=['POST'])
-@authorize
-def handle_login_by_mobile():
-    mobile = request.form.get('mobile')
-    code = request.form.get('code')
-    return login_ele_by_mobile(mobile, code, request.cookies.get(mobile))
+    sms_code = request.json.get('sms_code')
+    sms_token = request.json.get('sms_token')
+    success, cookies, content = login_ele_by_mobile(mobile, sms_code, sms_token)
+    if success:
+        resp = Response(jsonify(success=success))
+        for i, v in cookies.iteritems():
+            resp.set_cookie(i, v)
+        return resp
+    return jsonify(success=success, message=content)
 
 
 @crawlers_router.route('/configs', methods=['GET'])
@@ -104,17 +136,3 @@ def handel_crawlers_configs():
         ],
         "total": 3
     })
-
-
-def _wrap_result(item):
-    return {
-        'id': item.id,
-        'status': item.status,
-        'created': item.created.strftime('%Y-%d-%m %H:%M:%S'),
-        'finished': item.finished.strftime('%Y-%d-%m %H:%M:%S') if item.finished else '',
-        'args': item.args,
-        'info': item.info,
-        'extras': item.extras,
-        'total': item.total,
-        'count': item.data_count
-    }

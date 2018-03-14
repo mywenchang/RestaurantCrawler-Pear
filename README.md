@@ -1,11 +1,3 @@
-# 环境要求
-
-* python 2.X
-* 系统依赖
-    * zc.buildout
-    * beanstalkd
-    * mysql
-
 # 项目结构
 |模块名|文件目录|说明|
 |:---:|:---:|:---:|
@@ -14,7 +6,7 @@
 |爬虫任务执行|jobs|基于消息队列(beanstalkd)的任务调度|
 |数据操作|models|对数据库的 CRUD 操作实现, 基于 Sqlalchemy |
 
-# HTTP 接口说明
+# HTTP 方法说明
 
 * GET（SELECT）：从服务器取出资源（一项或多项）。
 * POST（CREATE）：在服务器新建一个资源。
@@ -24,67 +16,9 @@
 * HEAD：获取资源的元数据。
 * OPTIONS：获取信息，关于资源的哪些属性是客户端可以改变的。
 
-## 详细接口
+# 接口实现
 
-### 爬虫
-
-#### 获取可用爬虫
-
-GET `crawlers/configs`
-
-> 返回所有可用的爬虫配置信息
-
-```json
-{
-    "data": [
-        {
-            "args": [
-                "headers",
-                "cookies"
-            ],
-            "type": "restaurant",
-            "name": "饿了么商家",
-            "source": "ele"
-        },
-        {
-            "args": [
-                "headers",
-                "cookies"
-            ],
-            "type": "dish",
-            "name": "饿了么商家菜品",
-            "source": "ele"
-        },
-        {
-            "args": [
-                "headers",
-                "cookies"
-            ],
-            "type": "restaurant",
-            "name": "美团商家",
-            "source": "meituan"
-        }
-    ],
-    "total": 3
-}
-```
-#### 执行一个爬虫任务
-
-POST `/crawlers`
-
-参数:
-
-|参数名|类型|说明|必须|
-|:-:|:-:|:-:|:-:|
-|source|String|`crawlers/configs`接口返回|是|
-|type|String|`crawlers/configs`接口返回|是|
-|args|String|常用 HTTP 头信息, headers、cookies 等|否|
-
-#### 修改一个爬虫任务
-
-PATCH `crawlers/<crawler_id>`
-
-参数:
-
-|参数名|类型|说明|必须|
-|:-:|:-:|:-:|:-:|
+- [x] 登录注册
+- [x] 需要登录的接口，使用装饰器添加验证
+- [ ] 登录将爬取的平台
+- [x] 创建爬虫
