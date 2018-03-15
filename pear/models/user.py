@@ -3,16 +3,16 @@
 from datetime import datetime
 from sqlalchemy import select, or_
 
-from pear.models.tables import engine, user
+from pear.models.base import BaseDao
+from pear.models.tables import user
 
 
-class UserDao(object):
-    conn = engine.connect()
+class UserDao(BaseDao):
 
     @classmethod
     def get_by_id(cls, u_id):
         sql = select([user]).where(user.c.id == u_id)
-        return cls.conn.execute(sql).first()
+        return cls.get_one(sql)
 
     @classmethod
     def is_exist(cls, name=None, email=None, mobile=None):
@@ -21,7 +21,7 @@ class UserDao(object):
             user.c.email == email,
             user.c.mobile == mobile
         ))
-        return cls.conn.execute(sql).first()
+        return cls.get_one(sql)
 
     @classmethod
     def get_by_args(cls, password, account=None):
@@ -34,7 +34,7 @@ class UserDao(object):
                     user.c.email == account
                 )
             )
-        return cls.conn.execute(sql).first()
+        return cls.get_one(sql)
 
     @classmethod
     def create(cls, name, password, email, mobile):
@@ -47,4 +47,13 @@ class UserDao(object):
             sql = sql.values(email=email)
         if mobile:
             sql = sql.values(mobile=mobile)
-        return cls.conn.execute(sql).inserted_primary_key[0]
+        return cls.insert(sql)
+
+    @classmethod
+    def wrap_item(cls, item):
+        return {
+            'name': item.name,
+            'mobile': item.mobile,
+            'email': item.email,
+            'id': item.id
+        }

@@ -26,15 +26,20 @@ class RestaurantDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
+    def get_by_restaurant_id(cls, restaurant_id):
+        sql = select([restaurant]).where(restaurant.c.restaurant_id == restaurant_id)
+        return cls.get_one(sql)
+
+    @classmethod
     def batch(cls, page=1, per_page=20):
         sql = select([restaurant]).order_by(restaurant.c.id.asc())
         return cls.get_list(sql, page, per_page)
 
     @classmethod
-    def __wrap_item(cls, item):
+    def wrap_item(cls, item):
         return {
             "id": item.id,
-            "restaurant": item.restaurant,
+            "restaurant_id": item.restaurant_id,
             "name": item.name,
             "source": item.source,
             "sales": item.sales,

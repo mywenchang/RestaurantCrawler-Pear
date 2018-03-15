@@ -19,7 +19,7 @@ class DishDao(BaseDao):
         cls.insert(sql)
 
     @classmethod
-    def __wrap_item(cls, item):
+    def wrap_item(cls, item):
         return {
             "restaurant_id": item.restaurant_id,
             "name": item.name,

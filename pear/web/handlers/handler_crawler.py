@@ -6,7 +6,7 @@ from flask import jsonify, Blueprint, request, Response
 from pear.models.crawler import CrawlerDao
 from pear.utils.authorize import authorize
 from pear.crawlers import Crawlers
-from pear.web.controller.crawler_controller import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
+from pear.web.controllers.controller_crawler import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
 
 crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
 

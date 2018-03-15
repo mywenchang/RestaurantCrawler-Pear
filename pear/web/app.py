@@ -15,10 +15,10 @@ def check_health():
 
 
 def install_modules():
-    from pear.web.handlers.dashboard import dashboard_router
-    from pear.web.handlers.user import user_router
-    from pear.web.handlers.crawler import crawlers_router
-    from pear.web.handlers.authorize import authorize_router
+    from pear.web.handlers.handler_dashboard import dashboard_router
+    from pear.web.handlers.handler_user import user_router
+    from pear.web.handlers.handler_crawler import crawlers_router
+    from pear.web.handlers.handler_authorize import authorize_router
     app.register_blueprint(dashboard_router)
     app.register_blueprint(user_router)
     app.register_blueprint(crawlers_router)

@@ -68,7 +68,7 @@ class CrawlerDao(BaseDao):
         cls.update(sql)
 
     @classmethod
-    def __wrap_item(cls, item):
+    def wrap_item(cls, item):
         return {
             'id': item.id,
             'status': item.status,

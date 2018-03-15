@@ -7,14 +7,16 @@ import requests
 from pear.crawlers.base import BaseCrawler
 from pear.models.restaurant import RestaurantDao
 from pear.models.dish import DishDao
+from pear.models.rate import RateDao
 from pear.utils.const import Source
 
 logger = logging.getLogger('')
 
 
-class CrawlEleRestaurants(BaseCrawler):
+# 爬取商家
+class CrawlEleShop(BaseCrawler):
     def __init__(self, cookies, args=None):
-        super(CrawlEleRestaurants, self).__init__(cookies, args)
+        super(CrawlEleShop, self).__init__(cookies, args)
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0
@@ -91,8 +93,6 @@ class CrawlEleRestaurants(BaseCrawler):
 
         # 递归查询直到没有数据
         data_size = len(data)
-        logger.info('crawler page offset:{}'.format(self.page_offset))
-        logger.info('crawler data size:{}'.format(data_size))
         if data_size < 1 or (0 < self.limit <= data_size):
             self.done(self.page_offset)
             return
@@ -102,6 +102,7 @@ class CrawlEleRestaurants(BaseCrawler):
         self.crawl()
 
 
+# 爬取菜品
 class CrawlEleDishes(BaseCrawler):
     def __init__(self, cookies, args=None):
         super(CrawlEleDishes, self).__init__(cookies, args)
@@ -113,9 +114,11 @@ class CrawlEleDishes(BaseCrawler):
         self.longitude = args.get('longitude')
         self.cookies = cookies
         self.querystring = {"restaurant_id": self.restaurant_id}
+        restaurant = RestaurantDao.get_by_restaurant_id(self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",
-            'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, self.latitude, self.longitude),
+            'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),
+                                                    restaurant.get('longitude')),
             'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36",
             'referer': "https://www.ele.me/shop/{}".format(self.restaurant_id),
             'accept-encoding': "gzip, deflate, br",
@@ -151,3 +154,57 @@ class CrawlEleDishes(BaseCrawler):
                 self.update_count(total)
 
         self.done(total)
+
+
+# 爬取评论
+class CrawlerEleShopRate(BaseCrawler):
+    def __init__(self, cookies, args=None):
+        super(CrawlerEleShopRate, self).__init__(cookies, args)
+        self.page_size = 10
+        self.page_offset = 0
+        self.restaurant_id = args.get('restaurant_id')
+        restaurant = RestaurantDao.get_by_restaurant_id(self.restaurant_id)
+        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
+        self.headers = {
+            'accept': "application/json, text/plain, */*",
+            'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),
+                                                    restaurant.get('longitude')),
+            'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36",
+            'referer': "https://www.ele.me/shop/{}".format(self.restaurant_id),
+            'accept-encoding': "gzip, deflate, br",
+            'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
+            'cache-control': "no-cache",
+        }
+        self.querystring = {
+            "limit": self.page_size,
+            "offset": self.page_offset,
+            "record_type": 1
+        }
+        extras = {
+            'headers': self.headers,
+            'query': self.querystring
+        }
+        self.insert_extras(json.dumps(extras))
+
+    def crawl(self):
+        response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
+                                    cookies=self.cookies)
+        if response.status_code != requests.codes.ok:
+            self.error(json.dumps(response.json()))
+            self.done(self.page_offset)
+            return
+        data = response.json()
+        for item in data:
+            rating_star = item.get('rating_star')
+            rated_at = item.get('rated_at')
+            rating_text = item.get('rating_text')
+            time_spent_desc = item.get('time_spent_desc')
+            RateDao.create(rating_star, rated_at, rating_text, time_spent_desc, self.restaurant_id)
+        data_size = len(data)
+        if data_size < 1:
+            self.done(self.page_offset)
+            return
+        self.page_offset += data_size
+        self.querystring['offset'] = self.page_offset
+        self.update_count(self.page_offset)
+        self.crawl()

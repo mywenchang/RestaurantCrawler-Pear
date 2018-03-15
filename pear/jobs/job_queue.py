@@ -74,7 +74,7 @@ class Worker(object):
         self.signal_shutdown = False
         signal.signal(signal.SIGTERM, lambda signum, frame: self.graceful_shutdown())
         Worker.worker_id += 1
-        import_module_by_str('pear.web.controller.crawler_controller')
+        import_module_by_str('pear.web.controllers.controller_crawler')
 
     def subscribe(self):
         if isinstance(self.tubes, list):
@@ -128,7 +128,7 @@ class Worker(object):
             func(**kwargs)
             logger.info(u'{}-{}'.format(func, kwargs))
         except Exception as e:
-            logger.error(e)
+            logger.error(e.message, exc_info=True)
         cost = time.time() - start
         logger.info('{} cost {}s'.format(func_name, cost))
 
