@@ -94,7 +94,6 @@ class Worker(object):
         while True:
             if self.signal_shutdown:
                 break
-            logger.info('worker %d running' % Worker.worker_id)
             if self.signal_shutdown:
                 logger.info("graceful shutdown")
                 break
@@ -129,7 +128,7 @@ class Worker(object):
             func(**kwargs)
             logger.info(u'{}-{}'.format(func, kwargs))
         except Exception as e:
-            logger.error(e.message)
+            logger.error(e)
         cost = time.time() - start
         logger.info('{} cost {}s'.format(func_name, cost))
 

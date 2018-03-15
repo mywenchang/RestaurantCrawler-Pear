@@ -19,12 +19,9 @@ def _wrap_action(source, type):
 
 
 @queue.task('crawlers')
-def new_crawler(u_id, source, type, cookies, args):
+def new_crawler(source, type, cookies, args):
     action = _wrap_action(source, type)
-    if action not in Crawlers.keys():
-        logger.warn('Not found crawler for action:{}'.format(action))
-        return
-    crawler = Crawlers[action](u_id, cookies, args)
+    crawler = Crawlers[action](cookies, args)
     crawler.crawl()
 
 

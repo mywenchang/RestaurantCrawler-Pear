@@ -15,7 +15,7 @@ setup(
         "sqlalchemy",
         "pymysql",
         "beanstalkc",
-        "coloredlogs"
+        "PyYAML"
     ],
     entry_points={
         'console_scripts': [

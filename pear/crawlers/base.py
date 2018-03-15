@@ -1,5 +1,5 @@
 # coding=utf-8
-
+import json
 import logging
 
 from datetime import datetime
@@ -11,10 +11,10 @@ logger = logging.getLogger('')
 
 
 class BaseCrawler(object):
-    def __init__(self, u_id, cookies, args):
-        self.u_id = u_id
+    def __init__(self, cookies, args):
         self.cookies = cookies
-        self.id = CrawlerDao.create(u_id, args=args)
+        self.u_id = cookies.get('u_id')
+        self.id = CrawlerDao.create(self.u_id, args=json.dumps(args))
 
     def crawl(self):
         raise NotImplemented

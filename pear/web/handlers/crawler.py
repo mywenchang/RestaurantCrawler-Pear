@@ -5,6 +5,7 @@ from flask import jsonify, Blueprint, request, Response
 
 from pear.models.crawler import CrawlerDao
 from pear.utils.authorize import authorize
+from pear.crawlers import Crawlers
 from pear.web.controller.crawler_controller import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
 
 crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
@@ -36,11 +37,13 @@ def get_crawlers():
 def create_crawler():
     source = request.json.get('source')
     type = request.json.get('type')
+    crawler = '{}_{}_crawler'.format(source, type)
+    if crawler not in Crawlers.keys():
+        return jsonify(message='Not find {}'.format(crawler)), 400
     args = request.json.get('args')
-    u_id = request.cookies.get('u_id')
     cookies = request.cookies
     try:
-        new_crawler.put(u_id=u_id, source=source, type=type, cookies=cookies, args=args)
+        new_crawler.put(source=source, type=type, cookies=cookies, args=args)
     except Exception as e:
         return jsonify(message=e.message.__str__()), 500
     return jsonify(message='create crawler success'), 202
@@ -103,38 +106,25 @@ def login_ele():
     return jsonify(success=False, message=content)
 
 
+# --------------------------------------------
+
 @crawlers_router.route('/configs', methods=['GET'])
 @authorize
 def crawlers_configs():
     return jsonify({
         "data": [
             {
-                "args": [
-                    "headers",
-                    "cookies"
-                ],
-                "type": "restaurant",
-                "name": "饿了么商家",
-                "source": "ele"
-            },
-            {
-                "args": [
-                    "headers",
-                    "cookies"
-                ],
-                "type": "dish",
-                "name": "饿了么商家菜品",
-                "source": "ele"
-            },
-            {
-                "args": [
-                    "headers",
-                    "cookies"
-                ],
-                "type": "restaurant",
-                "name": "美团商家",
-                "source": "meituan"
+                "platform": "ele",
+                "types": [
+                    {
+                        "name": u"商家",
+                        "value": "restaurant"
+                    },
+                    {
+                        "name": u"菜品",
+                        "value": "dish"
+                    }
+                ]
             }
-        ],
-        "total": 3
+        ]
     })

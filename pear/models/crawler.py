@@ -3,12 +3,12 @@
 from datetime import datetime
 from sqlalchemy import update, select, delete, and_
 
-from pear.models.tables import crawler, engine
+from pear.models.base import BaseDao
+from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
 
 
-class CrawlerDao(object):
-    conn = engine.connect()
+class CrawlerDao(BaseDao):
 
     @classmethod
     def create(cls, u_id, args, info=None, extra=None):
@@ -21,7 +21,9 @@ class CrawlerDao(object):
             sql = sql.values(args=args)
         if extra is not None:
             sql = sql.values(extra=extra)
-        return cls.conn.execute(sql).inserted_primary_key[0]
+        if info is not None:
+            sql = sql.values(info=info)
+        return cls.insert(sql)
 
     @classmethod
     def update_by_id(cls, crawler_id, u_id, status=None, data_count=None, total=None, finished=None, info=None,
@@ -39,22 +41,22 @@ class CrawlerDao(object):
             sql = sql.values(info=info)
         if extras:
             sql = sql.values(extras=extras)
-        cls.conn.execute(sql)
+        cls.update(sql)
 
     @classmethod
     def get_by_id(cls, crawler_id, u_id, status=None):
         sql = select([crawler]).where(and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
         if status:
             sql = sql.where(crawler.c.status == status)
-        return cls._wrap_result(cls.conn.execute(sql).first())
+        return cls.get_one(sql)
 
     @classmethod
     def batch_get_by_status(cls, u_id, page=1, per_page=20, status=None):
         sql = select([crawler]).where(crawler.c.u_id == u_id)
-        sql = sql.limit(per_page).offset((page - 1) * per_page).order_by(crawler.c.id.asc())
+        sql = sql.order_by(crawler.c.id.asc())
         if status:
             sql = sql.where(crawler.c.status == status)
-        return [cls._wrap_result(item) for item in cls.conn.execute(sql).fetchall()]
+        return cls.get_list(sql, page, per_page)
 
     @classmethod
     def delete(cls, crawler_ids, u_id):
@@ -63,10 +65,10 @@ class CrawlerDao(object):
         else:
             sql = delete([crawler]).where(crawler.c.id == crawler_ids)
         sql = sql.where(crawler.c.u_id == u_id)
-        cls.conn.execute(sql)
+        cls.update(sql)
 
     @classmethod
-    def _wrap_result(cls, item):
+    def __wrap_item(cls, item):
         return {
             'id': item.id,
             'status': item.status,
