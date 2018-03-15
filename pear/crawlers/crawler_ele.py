@@ -11,8 +11,8 @@ logger = logging.getLogger('')
 
 
 class CrawlEleRestaurants(BaseCrawler):
-    def __init__(self, u_id, args=None):
-        super(CrawlEleRestaurants, self).__init__(u_id, args)
+    def __init__(self, u_id, cookies, args=None):
+        super(CrawlEleRestaurants, self).__init__(u_id, cookies, args)
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0
@@ -30,6 +30,7 @@ class CrawlEleRestaurants(BaseCrawler):
             'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
             'cache-control': "no-cache"
         }
+        self.cookies = cookies
         if args:
             args = json.loads(args)
             if args.get('latitude'):
@@ -43,8 +44,7 @@ class CrawlEleRestaurants(BaseCrawler):
             if args.get('geohash'):
                 self.geohash = args.get('geohash')
             if args.get('cookies'):
-                self.cookies = args.get('cookies',
-                                        {'USERID': '274692274', 'SID': 'DJPjUIwmk1bLeowGPT6y3msqlNn4kKhJHWLA'})
+                self.cookies.update(args.get('cookies'))
             if args.get('headers'):
                 self.headers.update(args.get('headers'))
         self.referer = "https://www.ele.me/place/{}?latitude={}&longitude={}".format(self.geohash, self.latitude,
@@ -82,6 +82,7 @@ class CrawlEleRestaurants(BaseCrawler):
             latitude = item.get('latitude'),
             longitude = item.get('longitude')
             # TODO insert into db
+            logging.info(item)
 
         # 递归查询直到没有数据
         data_size = len(data)

@@ -19,12 +19,12 @@ def _wrap_action(source, type):
 
 
 @queue.task('crawlers')
-def new_crawler(u_id, source, type, args):
+def new_crawler(u_id, source, type, cookies, args):
     action = _wrap_action(source, type)
     if action not in Crawlers.keys():
         logger.warn('Not found crawler for action:{}'.format(action))
         return
-    crawler = Crawlers[action](u_id, args)
+    crawler = Crawlers[action](u_id, cookies, args)
     crawler.crawl()
 
 
@@ -46,7 +46,7 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
         data = resp.json()
         if resp.status_code == 200:
             token = data.get('validate_token', '')
-            return True, token
+            return True, token, ''
         msg = data
         return False, token, msg
     except Exception as e:
@@ -88,7 +88,7 @@ def login_ele_by_mobile(mobile_phone, sms_code, sms_token):
     try:
         resp = requests.post(url, json=payload, headers=headers)
         if resp.status_code == 200:
-            return True, resp.cookies
+            return True, resp.cookies, resp.content
         return False, resp.cookies, resp.content
     except Exception as e:
         logger.error(e.message)

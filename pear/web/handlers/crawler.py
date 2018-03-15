@@ -20,7 +20,7 @@ def get_crawler(crawler_id=None):
     return jsonify(data=crawler)
 
 
-@crawlers_router.route('/', methods=['GET'])
+@crawlers_router.route('', methods=['GET'])
 @authorize
 def get_crawlers():
     page = request.args.get('page', 1)
@@ -31,15 +31,16 @@ def get_crawlers():
     return jsonify({'per_page': per_page, 'data': crawlers})
 
 
-@crawlers_router.route('/', methods=['POST'])
+@crawlers_router.route('', methods=['POST'])
 @authorize
 def create_crawler():
-    source = request.form.get('source')
-    type = request.form.get('type')
-    args = request.form.get('args')
+    source = request.json.get('source')
+    type = request.json.get('type')
+    args = request.json.get('args')
     u_id = request.cookies.get('u_id')
+    cookies = request.cookies
     try:
-        new_crawler.put(u_id=u_id, source=source, type=type, args=args)
+        new_crawler.put(u_id=u_id, source=source, type=type, cookies=cookies, args=args)
     except Exception as e:
         return jsonify(message=e.message.__str__()), 500
     return jsonify(message='create crawler success'), 202
@@ -66,44 +67,45 @@ def delete_crawler(crawler_id):
 
 
 # 获取图片验证码
-@crawlers_router.route('/get_ele_pic_code', methods=['GET'])
+@crawlers_router.route('/ele_pic_code', methods=['GET'])
 @authorize
 def get_pic_code():
     mobile = request.args.get('mobile')
     image_base64, image_token = get_captchas(mobile)
+    logging.info(u'饿了么图片验证码:{}\n{}'.format(image_base64, image_token))
     return jsonify(image_base64=image_base64, image_token=image_token)
 
 
-# 输入图片验证码字符，然后获取短信验证码
-@crawlers_router.route('/get_sms_code', methods=['GET'])
+# 获取短信验证码
+@crawlers_router.route('/ele_sms_code', methods=['GET'])
 @authorize
 def get_sms_code():
     mobile = request.args.get('mobile')
-    pic_code = request.args.get('pic_code')
-    image_token = request.args.get('image_token')
+    pic_code = request.args.get('pic_code', '')
+    image_token = request.args.get('image_token', '')
     success, sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
     return jsonify(success=success, sms_token=sms_token, message=msg)
 
 
-# 输入短信验证码登录
-@crawlers_router.route('/login_ele', methods=['POST'])
+# 通过短信验证码登录
+@crawlers_router.route('/login_ele', methods=['GET'])
 @authorize
 def login_ele():
-    mobile = request.json.get('mobile')
-    sms_code = request.json.get('sms_code')
-    sms_token = request.json.get('sms_token')
+    mobile = request.args.get('mobile')
+    sms_code = request.args.get('sms_code', '')
+    sms_token = request.args.get('sms_token', '')
     success, cookies, content = login_ele_by_mobile(mobile, sms_code, sms_token)
     if success:
-        resp = Response(jsonify(success=success))
+        resp = Response(jsonify(success=success, message=content), mimetype='application/json')
         for i, v in cookies.iteritems():
             resp.set_cookie(i, v)
         return resp
-    return jsonify(success=success, message=content)
+    return jsonify(success=False, message=content)
 
 
 @crawlers_router.route('/configs', methods=['GET'])
 @authorize
-def handel_crawlers_configs():
+def crawlers_configs():
     return jsonify({
         "data": [
             {

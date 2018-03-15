@@ -11,8 +11,9 @@ logger = logging.getLogger('')
 
 
 class BaseCrawler(object):
-    def __init__(self, u_id, args):
+    def __init__(self, u_id, cookies, args):
         self.u_id = u_id
+        self.cookies = cookies
         self.id = CrawlerDao.create(u_id, args=args)
 
     def crawl(self):
