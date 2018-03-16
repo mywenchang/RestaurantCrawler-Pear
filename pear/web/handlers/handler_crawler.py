@@ -3,9 +3,9 @@ import logging
 
 from flask import jsonify, Blueprint, request, Response
 
+from pear.crawlers import Crawlers
 from pear.models.crawler import CrawlerDao
 from pear.utils.authorize import authorize
-from pear.crawlers import Crawlers
 from pear.web.controllers.controller_crawler import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas
 
 crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
@@ -43,7 +43,7 @@ def create_crawler():
     args = request.json.get('args')
     cookies = request.cookies
     try:
-        new_crawler.put(source=source, type=type, cookies=cookies, args=args)
+        new_crawler.put(crawler, cookies=cookies, args=args)
     except Exception as e:
         return jsonify(message=e.message.__str__()), 500
     return jsonify(message='create crawler success'), 202

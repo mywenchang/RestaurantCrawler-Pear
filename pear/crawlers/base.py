@@ -3,7 +3,6 @@ import json
 import logging
 
 from datetime import datetime
-
 from pear.models.crawler import CrawlerDao
 from pear.utils.const import Crawler_Status
 
@@ -11,10 +10,10 @@ logger = logging.getLogger('')
 
 
 class BaseCrawler(object):
-    def __init__(self, cookies, args):
+    def __init__(self, c_type, cookies, args):
         self.cookies = cookies
         self.u_id = cookies.get('u_id')
-        self.id = CrawlerDao.create(self.u_id, args=json.dumps(args))
+        self.id = CrawlerDao.create(self.u_id, c_type, args=json.dumps(args))
 
     def crawl(self):
         raise NotImplemented

@@ -1,21 +1,21 @@
 # coding=utf-8
 
 from datetime import datetime
-from sqlalchemy import update, select, delete, and_
-
 from pear.models.base import BaseDao
 from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
+from sqlalchemy import update, select, delete, and_
 
 
 class CrawlerDao(BaseDao):
 
     @classmethod
-    def create(cls, u_id, args, info=None, extra=None):
+    def create(cls, u_id, type, args, info=None, extra=None):
         sql = crawler.insert().values(
             status=Crawler_Status.Crawling,
             created=datetime.now(),
-            u_id=u_id
+            u_id=u_id,
+            type=type
         )
         if args is not None:
             sql = sql.values(args=args)
@@ -69,6 +69,8 @@ class CrawlerDao(BaseDao):
 
     @classmethod
     def wrap_item(cls, item):
+        if not item:
+            return None
         return {
             'id': item.id,
             'status': item.status,
@@ -78,5 +80,6 @@ class CrawlerDao(BaseDao):
             'info': item.info,
             'extras': item.extras,
             'total': item.total,
-            'count': item.data_count
+            'count': item.data_count,
+            'type': item.type
         }

@@ -1,8 +1,7 @@
 # coding=utf-8
-from sqlalchemy import select
-
 from pear.models.base import BaseDao
 from pear.models.tables import restaurant
+from sqlalchemy import select
 
 
 class RestaurantDao(BaseDao):
@@ -37,6 +36,8 @@ class RestaurantDao(BaseDao):
 
     @classmethod
     def wrap_item(cls, item):
+        if not item:
+            return None
         return {
             "id": item.id,
             "restaurant_id": item.restaurant_id,

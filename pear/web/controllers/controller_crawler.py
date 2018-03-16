@@ -5,6 +5,7 @@ import logging
 import requests
 
 from pear.crawlers import Crawlers
+from pear.crawlers import crawler_types
 from pear.jobs.job_queue import JobQueue
 from pear.utils.config import LOGGING_FORMATTER
 
@@ -14,14 +15,14 @@ logger = logging.getLogger('')
 queue = JobQueue()
 
 
-def _wrap_action(source, type):
-    return '{}_{}_crawler'.format(source, type)
-
-
 @queue.task('crawlers')
-def new_crawler(source, type, cookies, args):
-    action = _wrap_action(source, type)
-    crawler = Crawlers[action](cookies, args)
+def new_crawler(crawler, cookies, args):
+    c_type = 0
+    for k, v in crawler_types.iteritems():
+        if v == crawler_types:
+            c_type = k
+            break
+    crawler = Crawlers[crawler](c_type, cookies, args)
     crawler.crawl()
 
 

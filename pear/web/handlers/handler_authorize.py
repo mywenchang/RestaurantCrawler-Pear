@@ -17,10 +17,11 @@ def login():
         return jsonify(message='Need account(Name/Email/Mobile).'), 400
     user = UserDao.get_by_args(password, account)
     if not user:
-        return jsonify(message='{} not exist.'.format(account)), 400
-    session[user.id] = user.name
+        return jsonify(message='{} not exist.'.format(account)), 401
+    session[user['id']] = user['name']
     resp = Response(json.dumps(dict(message='Login Success.')), mimetype='application/json')
-    resp.set_cookie(key='u_id', value=str(user.id))
+    resp.headers.add('Access-Control-Allow-Credentials', 'true')
+    resp.set_cookie(key='u_id', value=str(user['id']))
     return resp
 
 

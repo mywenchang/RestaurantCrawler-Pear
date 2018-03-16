@@ -3,20 +3,19 @@ import json
 import logging
 
 import requests
-
 from pear.crawlers.base import BaseCrawler
-from pear.models.restaurant import RestaurantDao
 from pear.models.dish import DishDao
 from pear.models.rate import RateDao
+from pear.models.restaurant import RestaurantDao
 from pear.utils.const import Source
 
 logger = logging.getLogger('')
 
 
 # 爬取商家
-class CrawlEleShop(BaseCrawler):
-    def __init__(self, cookies, args=None):
-        super(CrawlEleShop, self).__init__(cookies, args)
+class CrawlEleRestaurant(BaseCrawler):
+    def __init__(self, c_type, cookies, args=None):
+        super(CrawlEleRestaurant, self).__init__(c_type, cookies, args)
         self.url = 'https://www.ele.me/restapi/shopping/restaurants'
         self.page_size = 24
         self.page_offset = 0

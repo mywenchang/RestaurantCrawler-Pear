@@ -51,6 +51,8 @@ class UserDao(BaseDao):
 
     @classmethod
     def wrap_item(cls, item):
+        if not item:
+            return None
         return {
             'name': item.name,
             'mobile': item.mobile,

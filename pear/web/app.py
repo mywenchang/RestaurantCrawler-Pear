@@ -3,9 +3,10 @@
 import logging
 import os
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
+
 logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
 
 
@@ -29,6 +30,22 @@ def init_app():
     install_modules()
     app.secret_key = "pear_web_secret_key"
     return app
+
+
+@app.before_request
+def before_request():
+    logging.info('visitor: '.format(request.environ.get('HTTP_X_REAL_IP', request.remote_addr)))
+
+
+@app.after_request
+def after_request(response):
+    # 允许跨域(Access-Control-Allow-Credentials 为 true 时，值不能为*，必须为指定的 protocol://host:port)
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    # 和前端 fetch 的credentials选项配合，使其可以获取cookie
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
+    response.headers.add('Access-Control-Allow-Headers', 'content-type, accept')
+    return response
 
 
 def main():

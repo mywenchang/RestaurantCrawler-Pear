@@ -20,6 +20,8 @@ class DishDao(BaseDao):
 
     @classmethod
     def wrap_item(cls, item):
+        if not item:
+            return None
         return {
             "restaurant_id": item.restaurant_id,
             "name": item.name,

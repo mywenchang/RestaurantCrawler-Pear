@@ -32,6 +32,8 @@ class RateDao(BaseDao):
 
     @classmethod
     def wrap_item(cls, item):
+        if not item:
+            return None
         return {
             'id': item.id,
             'rating_start': item.rating_start,
