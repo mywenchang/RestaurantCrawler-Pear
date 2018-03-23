@@ -51,4 +51,4 @@ def after_request(response):
 def main():
     init_app()
     is_debug = os.getenv('is_debug', False)
-    app.run(debug=is_debug)
+    app.run(debug=is_debug, port=9999)
