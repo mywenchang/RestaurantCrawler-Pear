@@ -1,7 +1,6 @@
 # coding=utf-8
 
 import json
-import logging.config
 from collections import defaultdict
 
 import beanstalkc
@@ -9,10 +8,8 @@ import signal
 import time
 
 from pear.jobs.utils import import_module_by_str
-from pear.utils.config import BEANSTALK_CONFIG, LOGGING_FORMATTER
-
-logging.basicConfig(format=LOGGING_FORMATTER, level=logging.INFO)
-logger = logging.getLogger('')
+from pear.utils.config import BEANSTALK_CONFIG
+from pear.utils.logger import logger
 
 
 class Subscriber(object):

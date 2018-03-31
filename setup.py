@@ -15,7 +15,9 @@ setup(
         "sqlalchemy",
         "pymysql",
         "beanstalkc",
-        "PyYAML"
+        "PyYAML",
+        "flask-swagger-ui",
+        "gunicorn"
     ],
     entry_points={
         'console_scripts': [

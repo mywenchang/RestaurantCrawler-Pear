@@ -43,7 +43,7 @@ def create_crawler():
     args = request.json.get('args')
     cookies = request.cookies
     try:
-        new_crawler.put(crawler, cookies=cookies, args=args)
+        new_crawler.put(crawler=crawler, cookies=cookies, args=args)
     except Exception as e:
         return jsonify(message=e.message.__str__()), 500
     return jsonify(message='create crawler success'), 202

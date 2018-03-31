@@ -1,0 +1,221 @@
+openapi: 3.0.0
+
+info:
+  title: 数据分析爬取后台 API 文档和测试
+  description: 所有 API 均可在线测试.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:9999
+    description: 使用在线数据
+
+tags:
+  - name: auth
+    description: 用户验证
+  - name: user
+    description: 用户信息
+  - name: dashboard
+    description: 控制面板
+  - name: crawler
+    description: 爬虫
+
+paths: # 声明路径
+  /auth/signup:
+    post:
+      summary: 注册平台
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                account:
+                  type: string
+                  description: 用户帐号，可以为 邮箱/手机号/用户名
+                password:
+                  type: string
+              required:
+                - account
+                - password
+      responses:
+        '200':
+          description: 注册成功
+        '401':
+          description: 注册失败
+  /auth/login:
+    post:
+      summary: 登录平台
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: 用户帐号，可以为 邮箱/手机号/用户名
+                password:
+                  type: string
+              required:
+                - account
+                - password
+      responses:
+        '200':
+          description: 登录成功
+        '401':
+          description: 登录验证失败
+  /user:
+    get:
+      summary: 获取用户信息
+      tags:
+        - user
+      description: 返回用户信息
+      responses:
+        '200':
+          description: OK
+  /:
+    get:
+      summary: 控制面板概览信息
+      tags:
+        - dashboard
+      responses:
+        '200':
+          description: OK
+  /crawlers:
+    get:
+      summary: 获取当前用户执行过的所有爬虫任务信息
+      tags:
+        - crawler
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: 分页页码
+          example: 1
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+          description: 当前页请求数据
+          example: 10
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: 创建爬虫
+      tags:
+        - crawler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: string
+                  enum:
+                    - ele
+                    - meituan
+                  description: >
+                    爬取的平台简称:
+                     * `ele`
+                     * `meituan`
+
+                type:
+                  type: string
+                  enum:
+                    - restaurant
+                    - dish
+                    - rate
+                  description: >
+                    爬取的数据类型:
+                      * `restaurant`
+                      * `dish`
+                      * `rate`
+                args:
+                  type: object
+                  description: 爬虫任务自定义参数，根据 dashborad 接口返回值设置
+      responses:
+        '200':
+          description: Create Crawler Success
+  /crawlers/ele_pic_code:
+    get:
+      summary: 获取饿了么登录时的登录验证码图片
+      tags:
+        - crawler
+      parameters:
+        - in: query
+          name: mobile
+          schema:
+            type: string
+          description: 注册了饿了么的手机号
+      responses:
+        '200':
+          description: 获取验证码图片成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  image_token:
+                    type: string
+                    description: 图片验证码token
+                  image_base64:
+                    type: string
+                    description: base64编码之后的图片
+                    format: byte
+  /crawlers/ele_sms_code:
+    get:
+      summary: 获取饿了么短信验证码
+      tags:
+        - crawler
+      parameters:
+        - in: query
+          name: mobile
+          schema:
+            type: string
+          description: 注册了饿了么的手机号
+        - in: query
+          name: pic_code
+          schema:
+            type: string
+          description: 图片验证码内容
+        - in: query
+          name: image_token
+          schema:
+            type: string
+            description: 图片验证码token
+      responses:
+        '200':
+          description: 获取短信验证码成功
+  /crawlers/login_ele:
+    get:
+      summary: 通过短信验证码登录饿了么
+      tags:
+        - crawler
+      parameters:
+        - in: query
+          name: mobile
+          schema:
+            type: string
+          description: 注册了饿了么的手机号
+        - in: query
+          name: sms_code
+          schema:
+            type: string
+          description: 短信验证码
+        - in: query
+          name: sms_token
+          schema:
+            type: string
+          description: 短信验证码token
+      responses:
+        '200':
+          description: OK

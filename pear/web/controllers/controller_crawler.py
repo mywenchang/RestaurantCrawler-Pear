@@ -1,22 +1,18 @@
 # coding=utf-8
 
-import logging
-
 import requests
 
 from pear.crawlers import Crawlers
 from pear.crawlers import crawler_types
 from pear.jobs.job_queue import JobQueue
-from pear.utils.config import LOGGING_FORMATTER
-
-logging.basicConfig(format=LOGGING_FORMATTER, level=logging.INFO)
-logger = logging.getLogger('')
+from pear.utils.logger import logger
 
 queue = JobQueue()
 
 
 @queue.task('crawlers')
 def new_crawler(crawler, cookies, args):
+    logger.info('{}-{}-{}'.format(crawler, cookies, args))
     c_type = 0
     for k, v in crawler_types.iteritems():
         if v == crawler_types:
