@@ -49,7 +49,7 @@ def get_application():
         # 和前端 fetch 的credentials选项配合，使其可以获取cookie
         response.headers.add('Access-Control-Allow-Credentials', 'true')
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
-        response.headers.add('Access-Control-Allow-Headers', 'content-type, accept')
+        response.headers.add('Access-Control-Allow-Headers', 'content-type, accept, Access-Control-Allow-Origin')
         return response
 
     return app
