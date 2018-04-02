@@ -12,13 +12,14 @@ def index():
         "crawlers": [
             {
                 "name": u"饿了么",
-                "type": "ele"
+                "source": "ele"
             },
             {
                 "name": u"美团",
-                "type": "meituan"
+                "source": "meituan"
             }
         ],
+        "tasks": [{"id":"1", "type": "dish", "source":"ele", "total": 400, "current": 200, "status":0 }],
         "u_id": u_id
     }
-    return jsonify(data=data)
+    return jsonify(data)

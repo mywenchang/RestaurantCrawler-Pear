@@ -18,7 +18,7 @@ def login():
     if not user:
         return jsonify(message=u'账户 \'{}\' 不存在'.format(account)), 401
     session[user['id']] = user['name']
-    resp = Response(json.dumps(dict(message='Login Success.')), mimetype='application/json')
+    resp = Response(json.dumps({'message': 'Login Success.', 'user': user}), mimetype='application/json')
     resp.set_cookie(key='u_id', value=str(user['id']))
     return resp
 
