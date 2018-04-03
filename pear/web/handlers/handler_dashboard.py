@@ -2,10 +2,10 @@
 
 from flask import Blueprint, request, jsonify
 
-dashboard_router = Blueprint('dashboard', __name__)
+dashboard_router = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 
-@dashboard_router.route('/')
+@dashboard_router.route('')
 def index():
     u_id = request.cookies.get('u_id')
     data = {
@@ -19,7 +19,16 @@ def index():
                 "source": "meituan"
             }
         ],
-        "tasks": [{"id":"1", "type": "dish", "source":"ele", "total": 400, "current": 200, "status":0 }],
+        "crawler_tasks": [
+            {"id": "1", "type": "dish", "source": "ele", "total": 400, "current": 200, "status": -1},
+            {"id": "2", "type": "dish", "source": "ele", "total": 400, "current": 400, "status": 1},
+            {"id": "3", "type": "dish", "source": "ele", "total": 400, "current": 260, "status": 0},
+            {"id": "4", "type": "dish", "source": "ele", "total": 500, "current": 500, "status": 0},
+        ],
+        "analyse_tasks": [
+            {"id": "1", "type": "dish", "source": "ele", "total": 400, "current": 200, "status": -1},
+            {"id": "2", "type": "dish", "source": "ele", "total": 400, "current": 300, "status": 0}
+        ],
         "u_id": u_id
     }
     return jsonify(data)

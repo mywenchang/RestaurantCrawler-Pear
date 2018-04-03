@@ -36,7 +36,7 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
     }
     token = ''
     try:
-        resp = requests.post(url, json=payload, headers=headers)
+        resp = requests.post(url, json=payload, headers=headers, timeout=5)
         data = resp.json()
         if resp.status_code == 200:
             token = data.get('validate_token', '')
@@ -44,7 +44,7 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
         msg = data
         return False, token, msg
     except Exception as e:
-        msg = e.message
+        msg = e.message.__str__()
     return False, token, msg
 
 
@@ -59,7 +59,7 @@ def get_captchas(mobile_phone):
         'referer': 'https://h5.ele.me/login/'
     }
     try:
-        resp = requests.post(url, json=payload, headers=headers)
+        resp = requests.post(url, json=payload, headers=headers, timeout=5)
         if resp.status_code == 200:
             data = resp.json()
             return data.get('captcha_image'), data.get('captcha_hash')
@@ -80,7 +80,7 @@ def login_ele_by_mobile(mobile_phone, sms_code, sms_token):
         'referer': 'https://h5.ele.me/login/'
     }
     try:
-        resp = requests.post(url, json=payload, headers=headers)
+        resp = requests.post(url, json=payload, headers=headers, timeout=5)
         if resp.status_code == 200:
             return True, resp.cookies, resp.content
         return False, resp.cookies, resp.content

@@ -74,9 +74,9 @@ def delete_crawler(crawler_id):
 @authorize
 def get_pic_code():
     mobile = request.args.get('mobile')
-    image_base64, image_token = get_captchas(mobile)
-    logging.info(u'饿了么图片验证码:{}\n{}'.format(image_base64, image_token))
-    return jsonify(image_base64=image_base64, image_token=image_token)
+    ele_image_base64, ele_image_token = get_captchas(mobile)
+    logging.info(u'饿了么图片验证码:{}\n{}'.format(ele_image_base64, ele_image_token))
+    return jsonify(ele_image_base64=ele_image_base64, ele_image_token=ele_image_token)
 
 
 # 获取短信验证码
@@ -86,8 +86,8 @@ def get_sms_code():
     mobile = request.args.get('mobile')
     pic_code = request.args.get('pic_code', '')
     image_token = request.args.get('image_token', '')
-    success, sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
-    return jsonify(success=success, sms_token=sms_token, message=msg)
+    success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
+    return jsonify(success=success, ele_sms_token=ele_sms_token, message=msg)
 
 
 # 通过短信验证码登录
@@ -95,8 +95,8 @@ def get_sms_code():
 @authorize
 def login_ele():
     mobile = request.args.get('mobile')
-    sms_code = request.args.get('sms_code', '')
-    sms_token = request.args.get('sms_token', '')
+    sms_code = request.args.get('ele_sms_code', '')
+    sms_token = request.args.get('ele_sms_token', '')
     success, cookies, content = login_ele_by_mobile(mobile, sms_code, sms_token)
     if success:
         resp = Response(jsonify(success=success, message=content), mimetype='application/json')
