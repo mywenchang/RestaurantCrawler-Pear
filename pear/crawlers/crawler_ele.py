@@ -103,8 +103,8 @@ class CrawlEleRestaurant(BaseCrawler):
 
 # 爬取菜品
 class CrawlEleDishes(BaseCrawler):
-    def __init__(self, cookies, args=None):
-        super(CrawlEleDishes, self).__init__(cookies, args)
+    def __init__(self, c_type, cookies, args=None):
+        super(CrawlEleDishes, self).__init__(c_type, cookies, args)
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
         if not args:
             args = {}
