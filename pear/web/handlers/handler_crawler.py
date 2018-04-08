@@ -130,19 +130,28 @@ def ele_address():
     if data:
         return jsonify(data)
     else:
-        return []
+        return jsonify([])
 
 
-@crawlers_router.route('/get_ele_restaurants', methods='POST')
+@crawlers_router.route('/get_ele_restaurants', methods=['POST'])
 def ele_restaurants():
     cookies = request.cookies
-    address = request.json()
-    data = get_ele_restaurants(address.get('geohash'), address.get('latitude'), address.get('longitude'),
-                               offset=address.get('offset'), limit=address.get('limit'), cookies=cookies)
-    if data:
-        return jsonify(data)
-    else:
-        return []
+    address = request.json
+    offset = 0
+    limit = 24
+    result = []
+    ids = set()
+    while True:
+        data = get_ele_restaurants(address.get('geohash'), address.get('latitude'), address.get('longitude'),
+                                   offset=offset, limit=limit, cookies=cookies)
+        if data:
+            for item in data:
+                if item.get('id') not in ids:
+                    result.append(item)
+                    ids.add(item.get('id'))
+            offset += limit
+        else:
+            return jsonify(result)
 
 
 @crawlers_router.route('/configs', methods=['GET'])
