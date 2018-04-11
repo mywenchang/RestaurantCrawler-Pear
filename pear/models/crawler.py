@@ -1,10 +1,11 @@
 # coding=utf-8
 
 from datetime import datetime
+from sqlalchemy import update, select, delete, and_, func
+
 from pear.models.base import BaseDao
 from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
-from sqlalchemy import update, select, delete, and_
 
 
 class CrawlerDao(BaseDao):
@@ -52,11 +53,12 @@ class CrawlerDao(BaseDao):
 
     @classmethod
     def batch_get_by_status(cls, u_id, page=1, per_page=20, status=None):
-        sql = select([crawler]).where(crawler.c.u_id == u_id)
-        sql = sql.order_by(crawler.c.id.asc())
+        sql = select([crawler]).where(crawler.c.u_id == u_id).order_by(crawler.c.id.asc())
+        count_sql = select([func.count(crawler.c.id)]).where(crawler.c.u_id == u_id)
         if status:
             sql = sql.where(crawler.c.status == status)
-        return cls.get_list(sql, page, per_page)
+            count_sql = count_sql.where(crawler.c.status == status)
+        return cls.get_list(sql, page, per_page, count_sql)
 
     @classmethod
     def delete(cls, crawler_ids, u_id):

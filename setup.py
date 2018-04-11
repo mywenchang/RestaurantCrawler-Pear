@@ -17,7 +17,8 @@ setup(
         "beanstalkc",
         "PyYAML",
         "flask-swagger-ui",
-        "gunicorn"
+        "gunicorn",
+        'mock'
     ],
     entry_points={
         'console_scripts': [

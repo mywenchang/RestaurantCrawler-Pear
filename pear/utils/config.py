@@ -1,5 +1,7 @@
+import os
+
 config = {
-    'mysql': 'mysql+pymysql://root:jiyang147852@localhost/db_pear?charset=utf8',
+    'mysql': 'mysql+pymysql://root:root@localhost/db_pear?charset=utf8',
     'beanstalk': {
         'host': '0.0.0.0',
         'port': 11300
@@ -10,3 +12,4 @@ config = {
 MYSQL_CONFIG = config['mysql']
 BEANSTALK_CONFIG = config['beanstalk']
 LOGGING_FORMATTER = config['logging_formatter']
+IS_DEBUG = bool(os.getenv('is_debug', False))

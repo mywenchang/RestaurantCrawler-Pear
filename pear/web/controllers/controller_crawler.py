@@ -2,24 +2,11 @@
 
 import requests
 
-from pear.crawlers import Crawlers
-from pear.crawlers import crawler_types
+from pear.crawlers import CRAWLER_TYPES, CRAWLERS
 from pear.jobs.job_queue import JobQueue
 from pear.utils.logger import logger
 
 queue = JobQueue()
-
-
-@queue.task('crawlers')
-def new_crawler(crawler, cookies, args):
-    logger.info('{}-{}-{}'.format(crawler, cookies, args))
-    c_type = 0
-    for k, v in crawler_types.iteritems():
-        if v == crawler_types:
-            c_type = k
-            break
-    crawler = Crawlers[crawler](c_type, cookies, args)
-    crawler.crawl()
 
 
 def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
@@ -134,3 +121,19 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
             return data
     except Exception as e:
         logger.error(e, exc_info=True)
+
+
+@queue.task('crawlers')
+def commit_crawler_task(source, cookies, args):
+    crawler_str = "{}_crawler".format(source)
+    match_crawler = CRAWLERS.get(crawler_str)
+    if not match_crawler:
+        logger.error('{} NOT MATCH!'.format(crawler_str))
+        return
+    crawler_type = 0
+    for k, v in CRAWLER_TYPES.iteritems():
+        if v == crawler_str:
+            crawler_type = k
+            break
+    crawler = match_crawler(crawler_type, cookies, args)
+    crawler.crawl()

@@ -19,9 +19,13 @@ class BaseDao(object):
         return cls.wrap_item(cls.conn.execute(sql).first())
 
     @classmethod
-    def get_list(cls, sql, page, per_page):
+    def get_list(cls, sql, page, per_page, count_sql=None):
         sql = sql.limit(per_page).offset((page - 1) * per_page)
-        return [cls.wrap_item(item) for item in cls.conn.execute(sql).fetchall()]
+        result = [cls.wrap_item(item) for item in cls.conn.execute(sql).fetchall()]
+        count = 0
+        if count_sql is not None:
+            count = cls.conn.execute(count_sql).fetchone()[0]
+        return result, count
 
     @classmethod
     def wrap_item(cls, item):

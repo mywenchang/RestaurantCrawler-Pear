@@ -1,10 +1,11 @@
 # coding=utf-8
 
 import logging
-import os
 
 from flask import Flask, request, send_file
 from flask_swagger_ui import get_swaggerui_blueprint
+
+from pear.utils.config import IS_DEBUG
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
 SWAGGER_URL = '/doc'
@@ -14,12 +15,14 @@ SWAGGER_API_LOCATION = './swagger.yaml'
 def install_modules(app):
     from pear.web.handlers.handler_dashboard import dashboard_router
     from pear.web.handlers.handler_user import user_router
-    from pear.web.handlers.handler_crawler import crawlers_router
+    from pear.web.handlers.handler_config_ele_crawler import config_ele_crawler_router
     from pear.web.handlers.handler_authorize import authorize_router
+    from pear.web.handlers.handler_crawler_tasks import crawler_tasks_router
     app.register_blueprint(dashboard_router)
     app.register_blueprint(user_router)
-    app.register_blueprint(crawlers_router)
+    app.register_blueprint(config_ele_crawler_router)
     app.register_blueprint(authorize_router)
+    app.register_blueprint(crawler_tasks_router)
     swagger_ui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_API_LOCATION,
                                                    config={'app_name': u'数据分析后台接口文档'})
     app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
@@ -59,5 +62,4 @@ application = get_application()
 
 
 def main():
-    is_debug = os.getenv('is_debug', False)
-    application.run(debug=is_debug, port=9999)
+    application.run(debug=IS_DEBUG, port=9999, host='0.0.0.0')

@@ -4,64 +4,13 @@ import logging
 
 from flask import jsonify, Blueprint, request, Response
 
-from pear.crawlers import Crawlers
-from pear.models.crawler import CrawlerDao
 from pear.utils.authorize import authorize
-from pear.web.controllers.controller_crawler import new_crawler, get_ele_msg_code, login_ele_by_mobile, get_captchas, \
+from pear.web.controllers.controller_crawler import get_ele_msg_code, login_ele_by_mobile, get_captchas, \
     get_ele_city_list, search_ele_address, get_ele_restaurants
 
-crawlers_router = Blueprint('crawlers', __name__, url_prefix='/crawlers')
+config_ele_crawler_router = Blueprint('config_ele_crawler', __name__, url_prefix='/config_ele_crawler')
 
 logger = logging.getLogger('')
-
-
-@crawlers_router.route('/<int:crawler_id>', methods=['GET'])
-@authorize
-def get_crawler(crawler_id=None):
-    u_id = request.cookies.get('u_id')
-    crawler = CrawlerDao.get_by_id(crawler_id, u_id)
-    return jsonify(data=crawler)
-
-
-@crawlers_router.route('', methods=['GET'])
-@authorize
-def get_crawlers():
-    page = request.args.get('page', 1)
-    per_page = request.args.get('per_page', 20)
-    status = request.args.get('status', None)
-    u_id = request.cookies.get('u_id')
-    crawlers = CrawlerDao.batch_get_by_status(u_id, page=int(page), per_page=int(per_page), status=status)
-    return jsonify({'per_page': per_page, 'data': crawlers})
-
-
-@crawlers_router.route('', methods=['POST'])
-@authorize
-def create_crawler():
-    source = request.json.get('source')
-    type = request.json.get('type')
-    crawler = '{}_{}_crawler'.format(source, type)
-    if crawler not in Crawlers.keys():
-        return jsonify(message='Not find {}'.format(crawler)), 400
-    args = request.json.get('args')
-    cookies = request.cookies
-    try:
-        new_crawler.put(crawler=crawler, cookies=cookies, args=args)
-    except Exception as e:
-        return jsonify(success=False, message=e.message.__str__()), 500
-    return jsonify(success=True, message='create crawler success'), 202
-
-
-@crawlers_router.route('/<int:crawler_id>', methods=['PUT'])
-@authorize
-def update_crawler(crawler_id):
-    return jsonify(status="ok")
-
-
-@crawlers_router.route('/<int:crawler_id>', methods=['DELETE'])
-@authorize
-def delete_crawler(crawler_id):
-    return jsonify(status="ok")
-
 
 # ------------------登录饿了么-----------------
 
@@ -72,7 +21,7 @@ def delete_crawler(crawler_id):
 
 
 # 获取图片验证码
-@crawlers_router.route('/ele_pic_code', methods=['GET'])
+@config_ele_crawler_router.route('/pic_code', methods=['GET'])
 @authorize
 def get_pic_code():
     mobile = request.args.get('mobile')
@@ -82,7 +31,7 @@ def get_pic_code():
 
 
 # 获取短信验证码
-@crawlers_router.route('/ele_sms_code', methods=['GET'])
+@config_ele_crawler_router.route('/sms_code', methods=['GET'])
 @authorize
 def get_sms_code():
     mobile = request.args.get('mobile')
@@ -93,7 +42,7 @@ def get_sms_code():
 
 
 # 通过短信验证码登录
-@crawlers_router.route('/login_ele', methods=['GET'])
+@config_ele_crawler_router.route('/login_ele', methods=['GET'])
 @authorize
 def login_ele():
     mobile = request.args.get('mobile')
@@ -114,7 +63,7 @@ def login_ele():
 
 # --------------------------------------------
 
-@crawlers_router.route('/ele_cities')
+@config_ele_crawler_router.route('/cities')
 def fetch_ele_cites():
     city_dict = get_ele_city_list()
     if city_dict:
@@ -123,7 +72,7 @@ def fetch_ele_cites():
         return []
 
 
-@crawlers_router.route('/search_ele_address')
+@config_ele_crawler_router.route('/search_address')
 def ele_address():
     keyword = request.args.get('key')
     data = search_ele_address(keyword)
@@ -133,7 +82,7 @@ def ele_address():
         return jsonify([])
 
 
-@crawlers_router.route('/get_ele_restaurants', methods=['POST'])
+@config_ele_crawler_router.route('/get_restaurants', methods=['POST'])
 def ele_restaurants():
     cookies = request.cookies
     address = request.json
@@ -154,7 +103,7 @@ def ele_restaurants():
             return jsonify(result)
 
 
-@crawlers_router.route('/configs', methods=['GET'])
+@config_ele_crawler_router.route('/configs', methods=['GET'])
 @authorize
 def crawlers_configs():
     platform = request.args.get('platform')

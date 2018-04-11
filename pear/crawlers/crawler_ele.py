@@ -108,12 +108,12 @@ class CrawlEleDishes(BaseCrawler):
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
         if not args:
             args = {}
-        self.restaurant_id = args.get('restaurant_id')
+        restaurant = args.get('restaurant')
+        self.restaurant_id = restaurant.get('id')
         self.latitude = args.get('latitude')
         self.longitude = args.get('longitude')
         self.cookies = cookies
         self.querystring = {"restaurant_id": self.restaurant_id}
-        restaurant = RestaurantDao.get_by_restaurant_id(self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),

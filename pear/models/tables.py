@@ -1,9 +1,9 @@
 # coding=utf-8
 from sqlalchemy import Table, create_engine, MetaData
 
-from pear.utils.config import MYSQL_CONFIG
+from pear.utils.config import MYSQL_CONFIG, IS_DEBUG
 
-engine = create_engine(MYSQL_CONFIG, echo=False)
+engine = create_engine(MYSQL_CONFIG, echo=IS_DEBUG)
 metadata = MetaData(bind=engine)
 
 crawler = Table('crawler', metadata, autoload=True)
