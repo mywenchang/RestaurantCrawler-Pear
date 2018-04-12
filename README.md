@@ -18,10 +18,16 @@
 
 # 接口实现
 
-- [x] 登录注册
+- [x] 登录注册 `/auth/login` `auth/signup`
 - [x] 需要登录的接口，使用装饰器添加验证
 - [x] 登录饿了么
 - [x] 饿了么商家爬虫
 - [x] 饿了么商家菜品爬虫
 - [x] 饿了么商家评论爬虫
 - [ ] 饿了么数据分析
+
+
+# Api
+- 登录注册 `/auth/login` `auth/signup`
+- 登录饿了么
+    - `/config_ele_crawler/login_ele`
