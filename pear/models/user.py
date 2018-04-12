@@ -50,6 +50,11 @@ class UserDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
+    def delete(cls, id):
+        sql = user.delete().where(user.c.id == id)
+        return cls.update(sql)
+
+    @classmethod
     def wrap_item(cls, item):
         if not item:
             return None

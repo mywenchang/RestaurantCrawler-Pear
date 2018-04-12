@@ -11,7 +11,7 @@ from pear.utils.const import Crawler_Status
 class CrawlerDao(BaseDao):
 
     @classmethod
-    def create(cls, u_id, type, args, info=None, extra=None):
+    def create(cls, u_id, type, args, info=None, extras=None):
         sql = crawler.insert().values(
             status=Crawler_Status.Crawling,
             created=datetime.now(),
@@ -20,8 +20,8 @@ class CrawlerDao(BaseDao):
         )
         if args is not None:
             sql = sql.values(args=args)
-        if extra is not None:
-            sql = sql.values(extra=extra)
+        if extras is not None:
+            sql = sql.values(extras=extras)
         if info is not None:
             sql = sql.values(info=info)
         return cls.insert(sql)
@@ -63,9 +63,9 @@ class CrawlerDao(BaseDao):
     @classmethod
     def delete(cls, crawler_ids, u_id):
         if isinstance(crawler_ids, list):
-            sql = delete([crawler]).where(crawler.c.id in crawler_ids)
+            sql = crawler.delete().where(crawler.c.id in crawler_ids)
         else:
-            sql = delete([crawler]).where(crawler.c.id == crawler_ids)
+            sql = crawler.delete().where(crawler.c.id == crawler_ids)
         sql = sql.where(crawler.c.u_id == u_id)
         cls.update(sql)
 

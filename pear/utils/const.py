@@ -1,6 +1,7 @@
 # coding=utf-8
 # 数据来源
-class Source(object):
+
+class SOURCE(object):
     ELE = 1
     MEI_TUAN = 2
 

@@ -4,6 +4,8 @@ import requests
 
 from pear.crawlers import CRAWLER_TYPES, CRAWLERS
 from pear.jobs.job_queue import JobQueue
+from pear.models.restaurant import RestaurantDao
+from pear.utils.const import SOURCE
 from pear.utils.logger import logger
 
 queue = JobQueue()
@@ -35,7 +37,7 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
     return False, token, msg
 
 
-def get_captchas(mobile_phone):
+def get_ele_captchas(mobile_phone):
     url = 'https://www.ele.me/restapi/eus/v3/captchas'
     payload = {
         'captcha_str': mobile_phone
@@ -118,6 +120,18 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
         resp = requests.get(url, timeout=5, params=params, cookies=cookies)
         if resp.status_code == 200:
             data = resp.json()
+            for item in data:
+                save_ele_restaurants.put(
+                    source=SOURCE.ELE,
+                    restaurant_id=item['id'],
+                    name=item['name'],
+                    sales=item['recent_order_num'],
+                    arrive_time=item['order_lead_time'],
+                    send_fee=item['float_delivery_fee'],
+                    score=item['rating'],
+                    latitude=item['latitude'],
+                    longitude=item['longitude']
+                )
             return data
     except Exception as e:
         logger.error(e, exc_info=True)
@@ -137,3 +151,8 @@ def commit_crawler_task(source, cookies, args):
             break
     crawler = match_crawler(crawler_type, cookies, args)
     crawler.crawl()
+
+
+@queue.task('crawlers')
+def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
+    RestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)

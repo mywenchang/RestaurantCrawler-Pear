@@ -3,23 +3,34 @@
 import json
 import unittest
 
-from mock import patch
+from datetime import datetime
 
+from pear.models.crawler import CrawlerDao
+from pear.models.user import UserDao
 from pear.web.app import get_application
 
 
 class TestCrawler(unittest.TestCase):
     def setUp(self):
         self.app = get_application().test_client()
-        resp = self.app.post('/auth/login', data=json.dumps(dict(account='jiyang', password='jiyang')),
-                             content_type='application/json')
-        u_id = resp.headers.get('Set-cookie').split(';')[0][5:]
-        self.app.set_cookie('localhost', 'u_id', u_id)
+        self.user_id = UserDao.create('t', 't', 't@t.com', '1')
+        self.c_id = [
+            CrawlerDao.create(self.user_id, 1, '', '', ''),
+            CrawlerDao.create(self.user_id, 2, '', '', '')
+        ]
+        for i in self.c_id:
+            CrawlerDao.update_by_id(i, self.user_id, status=1, data_count=10, total=10, finished=datetime.now())
+        self.app.set_cookie('localhost', 'u_id', str(self.user_id))
+        with self.app.session_transaction() as session:
+            session[str(self.user_id)] = 't'
 
-    @patch('pear.web.handlers.handler_crawler_tasks.CrawlerDao')
-    def test_get_all_task(self, mock_dao):
-        mock_dao.batch_get_by_status.return_value = ([], 0)
-        re = self.app.get('/crawler_tasks?page=9999&per_page=2&status=0')
+    def test_get_all_task(self):
+        re = self.app.get('/crawler_tasks?page=1&per_page=10&status=1')
         data = json.loads(re.data)
         self.assertEqual(200, re.status_code)
-        self.assertEqual(9999, data['page'])
+        self.assertEqual(1, data['page'])
+        self.assertEqual(2, data['total'])
+
+    def tearDown(self):
+        UserDao.delete(self.user_id)
+        CrawlerDao.delete([self.c_id], self.user_id)

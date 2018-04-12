@@ -6,12 +6,10 @@ CREATE TABLE `restaurant` (
 	`source` TINYINT(1) COMMENT '数据来源',
 	`sales` INT(11) UNSIGNED COMMENT '销量',
 	`arrive_time` INT(4) UNSIGNED COMMENT '平均到达时间',
-	`start_fee` FLOAT UNSIGNED DEFAULT 0 COMMENT '起送费',
 	`send_fee` FLOAT UNSIGNED DEFAULT 0 COMMENT '配送费',
 	`score` FLOAT UNSIGNED DEFAULT 0 COMMENT '评分',
 	`latitude` VARCHAR(20),
 	`longitude` VARCHAR(20),
-	`crawler_id` INT(11) UNSIGNED NOT NULL COMMENT '提交任务的爬虫id',
 	PRIMARY KEY (`id`),
 	KEY `idx_restaurant_id` (`restaurant_id`)
 ) ENGINE = InnoDB CHARSET = utf8;

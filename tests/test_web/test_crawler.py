@@ -4,15 +4,16 @@ import json
 import unittest
 
 from pear.web.app import get_application
+from pear.models.user import UserDao
 
 
 class TestCrawler(unittest.TestCase):
     def setUp(self):
         self.app = get_application().test_client()
-        resp = self.app.post('/auth/login', data=json.dumps(dict(account='jiyang', password='jiyang')),
-                             content_type='application/json')
-        u_id = resp.headers.get('Set-cookie').split(';')[0][5:]
-        self.app.set_cookie('localhost', 'u_id', u_id)
+        self.user_id = UserDao.create('n', 'p', 'e', '1111')
+        self.app.set_cookie('localhost', 'u_id', str(self.user_id))
+        with self.app.session_transaction() as session:
+            session[str(self.user_id)] = 1
 
     def test_get_ele_pic_code(self):
         mobile = '18502823774'
@@ -31,3 +32,6 @@ class TestCrawler(unittest.TestCase):
         }]
         rv = self.app.post('/crawler_tasks', data=json.dumps(request_data), content_type='application/json')
         self.assertEqual(200, rv.status_code)
+
+    def tearDown(self):
+        UserDao.delete(self.user_id)

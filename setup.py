@@ -18,7 +18,8 @@ setup(
         "PyYAML",
         "flask-swagger-ui",
         "gunicorn",
-        'mock'
+        'mock',
+        'pytest'
     ],
     entry_points={
         'console_scripts': [

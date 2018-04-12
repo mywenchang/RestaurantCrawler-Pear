@@ -3,11 +3,12 @@ import json
 import logging
 
 import requests
+
 from pear.crawlers.base import BaseCrawler
 from pear.models.dish import DishDao
 from pear.models.rate import RateDao
 from pear.models.restaurant import RestaurantDao
-from pear.utils.const import Source
+from pear.utils.const import SOURCE
 
 logger = logging.getLogger('')
 
@@ -79,7 +80,7 @@ class CrawlEleRestaurant(BaseCrawler):
         for item in data:
             restaurant_id = item.get('id'),
             name = item.get('name'),
-            source = Source.ELE,
+            source = SOURCE.ELE,
             arrive_time = item.get('order_lead_time'),
             start_fee = item.get('float_minimum_order_amount'),
             send_fee = item.get('float_delivery_fee'),
@@ -130,6 +131,7 @@ class CrawlEleDishes(BaseCrawler):
             'query': self.querystring
         }
         self.insert_extras(json.dumps(extras))
+        self.dish_crawler = CrawlEleDishes(3, cookies, args)
 
     def crawl(self):
         response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
@@ -153,6 +155,7 @@ class CrawlEleDishes(BaseCrawler):
                 self.update_count(total)
 
         self.done(total)
+        self.dish_crawler.crawl()
 
 
 # 爬取评论
@@ -161,8 +164,10 @@ class CrawlerEleShopRate(BaseCrawler):
         super(CrawlerEleShopRate, self).__init__(cookies, args)
         self.page_size = 10
         self.page_offset = 0
-        self.restaurant_id = args.get('restaurant_id')
-        restaurant = RestaurantDao.get_by_restaurant_id(self.restaurant_id)
+        restaurant = args.get('restaurant')
+        self.restaurant_id = restaurant.get('id')
+        self.latitude = args.get('latitude')
+        self.longitude = args.get('longitude')
         self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",

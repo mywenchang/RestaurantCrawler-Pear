@@ -7,20 +7,17 @@ from sqlalchemy import select
 class RestaurantDao(BaseDao):
 
     @classmethod
-    def create(cls, restaurant_id, name, source, sales, arrive_time, start_fee, send_fee, score, latitude, longitude,
-               crawler_id):
+    def create(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
         sql = restaurant.insert().values(
             restaurant_id=restaurant_id,
             name=name,
             source=source,
             sales=sales,
             arrive_time=arrive_time,
-            start_fee=start_fee,
             send_fee=send_fee,
             score=score,
             latitude=latitude,
-            longitude=longitude,
-            crawler_id=crawler_id
+            longitude=longitude
         )
         return cls.insert(sql)
 
