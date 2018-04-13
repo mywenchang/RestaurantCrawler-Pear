@@ -4,13 +4,15 @@ from sqlalchemy import select
 
 from pear.models.base import BaseDao
 from pear.models.tables import rate
+from sqlalchemy.sql import and_
 
 
 class RateDao(BaseDao):
 
     @classmethod
-    def create(cls, rating_start, rated_at, rating_text, time_spent_desc, restaurant_id):
+    def create(cls, restaurant_crawler_id, rating_start, rated_at, rating_text, time_spent_desc, restaurant_id):
         sql = rate.insert().values(
+            restaurant_crawler_id=restaurant_crawler_id,
             rating_start=rating_start,
             rated_at=rated_at,
             rating_text=rating_text,
@@ -20,9 +22,12 @@ class RateDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def get_by_restaurant_id(cls, restaurant_id, rating_start=-1, page=1, per_page=20):
+    def get_by_restaurant_id(cls, restaurant_crawler_id, restaurant_id, rating_start=-1, page=1, per_page=20):
         sql = select([rate]).where(
-            rate.c.restaurant_id == restaurant_id
+            and_(
+                rate.c.restaurant_id == restaurant_id,
+                rate.c.restaurant_crawler_id == restaurant_crawler_id
+            )
         )
         if rating_start > 0:
             sql = sql.where(
@@ -40,5 +45,6 @@ class RateDao(BaseDao):
             'rated_at': item.rated_at,
             'rating_text': item.rating_text,
             'time_spent_desc': item.time_spent_desc,
-            'restaurant_id': item.restaurant_id
+            'restaurant_id': item.restaurant_id,
+            'restaurant_crawler_id': item.restaurant_crwaler_id
         }

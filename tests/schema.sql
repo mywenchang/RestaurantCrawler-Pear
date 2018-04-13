@@ -65,7 +65,8 @@ CREATE TABLE `rate` (
     `rating_text` TEXT,
     `time_spent_desc` VARCHAR(50),
     `restaurant_id` INT(11) UNSIGNED,
+    `restaurant_crawler_id` INT(11) UNSIGNED,
     PRIMARY KEY (`id`),
-    KEY `idx_restaurant_id` (`restaurant_id`),
+    KEY `idx_restaurant_crawler_id` (`restaurant_id`, `restaurant_crawler_id`),
     KEY `idx_restaurant_id_rating_start` (`restaurant_id`, `rating_start`)
 ) ENGINE = InnoDB CHARSET = utf8;

@@ -16,11 +16,13 @@ class UserDao(BaseDao):
 
     @classmethod
     def is_exist(cls, name=None, email=None, mobile=None):
-        sql = select([user]).where(or_(
-            user.c.name == name,
-            user.c.email == email,
-            user.c.mobile == mobile
-        ))
+        sql = select([user])
+        if name:
+            sql = sql.where(or_(user.c.name == name))
+        if email:
+            sql = sql.where(or_(user.c.email == email))
+        if mobile:
+            sql = sql.where(or_(user.c.mobile == mobile))
         return cls.get_one(sql)
 
     @classmethod
