@@ -20,7 +20,7 @@ def login():
     if not user:
         return jsonify(message=u'密码错误'), 401
     session[user['id']] = user['name']
-    resp = Response(json.dumps({'message': 'Login Success.', 'user': user}), mimetype='application/json')
+    resp = Response(json.dumps({'message': u'登录成功', 'user': user}), mimetype='application/json')
     resp.set_cookie(key='u_id', value=str(user['id']))
     return resp
 
@@ -35,8 +35,8 @@ def signup():
     sms_code = data.get('smsCode')
     # TODO 验证短信验证码
     if UserDao.is_exist(email=email, name=name, mobile=mobile):
-        return jsonify(message='User existed.'), 409
+        return jsonify(message=u'用户已经存在'), 409
     if not password or not mobile:
-        return jsonify(message='Must have password and mobile.'), 400
+        return jsonify(message=u'缺少密码或手机号'), 400
     UserDao.create(name, password, email, mobile)
-    return jsonify(message="SignUp Success.")
+    return jsonify(message=u"注册成功")

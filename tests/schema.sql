@@ -17,6 +17,7 @@ CREATE TABLE `restaurant` (
 DROP TABLE IF EXISTS `dish`;
 CREATE TABLE `dish` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
+	`food_id` INT(11) UNSIGNED COMMENT '菜品id',
 	`restaurant_id` INT(11) UNSIGNED COMMENT 'restaurant 表中的 id',
 	`name` VARCHAR(100)  DEFAULT NULL COMMENT '菜品名称',
 	`rating` FLOAT UNSIGNED  DEFAULT 0 COMMENT '评价',
@@ -66,7 +67,12 @@ CREATE TABLE `rate` (
     `time_spent_desc` VARCHAR(50),
     `restaurant_id` INT(11) UNSIGNED,
     `restaurant_crawler_id` INT(11) UNSIGNED,
+    `food_id` INT(11) UNSIGNED COMMENT '菜品id 对应 dish 表中 food_id',
+    `food_name` TEXT,
+    `food_star` INT(4),
+    `food_rate` TEXT,
     PRIMARY KEY (`id`),
-    KEY `idx_restaurant_crawler_id` (`restaurant_id`, `restaurant_crawler_id`),
-    KEY `idx_restaurant_id_rating_start` (`restaurant_id`, `rating_start`)
+    KEY `idx_restaurant_crawler_food_id` (`restaurant_id`, `restaurant_crawler_id`, `food_id`),
+    KEY `idx_restaurant_id_rating_start` (`restaurant_id`, `rating_start`),
+    KEY `idx_food` (`food_id`)
 ) ENGINE = InnoDB CHARSET = utf8;

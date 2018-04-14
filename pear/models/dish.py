@@ -7,8 +7,9 @@ from pear.models.tables import dish
 class DishDao(BaseDao):
 
     @classmethod
-    def create(cls, restaurant_id, name, rating, moth_sales, rating_count, crawler_id):
+    def create(cls, food_id, restaurant_id, name, rating, moth_sales, rating_count, crawler_id):
         sql = dish.insert().values(
+            food_id=food_id,
             restaurant_id=restaurant_id,
             name=name,
             rating=rating,
@@ -23,6 +24,7 @@ class DishDao(BaseDao):
         if not item:
             return None
         return {
+            "food_id": item.food_id,
             "restaurant_id": item.restaurant_id,
             "name": item.name,
             "rating": item.rating,

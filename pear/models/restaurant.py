@@ -1,7 +1,8 @@
 # coding=utf-8
+from sqlalchemy import select
+
 from pear.models.base import BaseDao
 from pear.models.tables import restaurant
-from sqlalchemy import select
 
 
 class RestaurantDao(BaseDao):
@@ -27,6 +28,13 @@ class RestaurantDao(BaseDao):
         return cls.get_one(sql)
 
     @classmethod
+    def update_by_restaurant_id(cls, restaurant_id, **kwargs):
+        sql = restaurant.update().where(restaurant_id)
+        for k, v in kwargs.iteritems():
+            sql = sql.values(k=v)
+        return cls.update(sql)
+
+    @classmethod
     def batch(cls, page=1, per_page=20):
         sql = select([restaurant]).order_by(restaurant.c.id.asc())
         return cls.get_list(sql, page, per_page)
@@ -42,7 +50,6 @@ class RestaurantDao(BaseDao):
             "source": item.source,
             "sales": item.sales,
             "arrive_time": item.arrive_time,
-            "start_fee": item.start_fee,
             "score": item.score,
             "latitude": item.latitude,
             "longitude": item.longitude

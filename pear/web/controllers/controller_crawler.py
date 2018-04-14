@@ -155,4 +155,10 @@ def commit_crawler_task(source, cookies, args):
 
 @queue.task('crawlers')
 def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
-    RestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)
+    restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id)
+    if restaurant:
+        RestaurantDao.update_by_restaurant_id(restaurant_id, name=name, source=source, sales=sales,
+                                              arrive_time=arrive_time, send_fee=send_fee, score=score,
+                                              latitude=latitude, longitude=longitude)
+    else:
+        RestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)

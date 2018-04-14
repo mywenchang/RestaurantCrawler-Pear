@@ -16,6 +16,7 @@ class CrawlEleDishes(BaseCrawler):
     def __init__(self, c_type, cookies, args=None):
         super(CrawlEleDishes, self).__init__(c_type, cookies, args)
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
+        self.args = args
         if not args:
             args = {}
         restaurant = args.get('restaurant')
@@ -40,18 +41,17 @@ class CrawlEleDishes(BaseCrawler):
             'query': self.querystring
         }
         self.insert_extras(json.dumps(extras))
-        self.dish_crawler = CrawlerEleShopRate(3, cookies, self.id, args)
 
     def crawl(self):
+        logger.info('start_craw_ele_dishes_{}'.format(self.restaurant_id))
         response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
                                     cookies=self.cookies)
         if response.status_code != requests.codes.ok:
-            self.error('response code != 200')
+            self.error(json.dumps(response.json()))
             return
         dishes = response.json()
         total = 0
         for item in dishes:
-            logging.info(item)
             foods = item.get('foods')
             for food_item in foods:
                 name = food_item.get('name'),
@@ -59,12 +59,14 @@ class CrawlEleDishes(BaseCrawler):
                 rating = food_item.get('rating'),
                 month_sales = food_item.get('month_sales'),
                 rating_count = food_item.get('rating_count')
-                DishDao.create(restaurant_id, name, rating, month_sales, rating_count, self.id)
+                food_id = food_item.get('food_id')
+                DishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, self.id)
                 total += 1
                 self.update_count(total)
 
         self.done(total)
-        self.dish_crawler.crawl()
+        dish_crawler = CrawlerEleShopRate(3, self.cookies, self.id, self.args)
+        dish_crawler.crawl()
 
 
 # 爬取评论
@@ -101,6 +103,7 @@ class CrawlerEleShopRate(BaseCrawler):
         self.insert_extras(json.dumps(extras))
 
     def crawl(self):
+        logger.info('start_crawl_ele_rate_{}'.format(self.restaurant_id))
         response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
                                     cookies=self.cookies)
         if response.status_code != requests.codes.ok:
@@ -113,8 +116,14 @@ class CrawlerEleShopRate(BaseCrawler):
             rated_at = item.get('rated_at')
             rating_text = item.get('rating_text')
             time_spent_desc = item.get('time_spent_desc')
-            RateDao.create(self.restaurant_crawler_id, rating_star, rated_at, rating_text, time_spent_desc,
-                           self.restaurant_id)
+            food_list = item.get('item_rating_list')
+            for food in food_list:
+                food_id = food.get('food_id')
+                food_name = food.get('rate_name')
+                food_star = food.get('rating_star')
+                food_rate = food.get('rating_text')
+                RateDao.create(self.restaurant_crawler_id, rating_star, rated_at, rating_text, time_spent_desc,
+                               food_id, food_name, food_star, food_rate, self.restaurant_id)
         data_size = len(data)
         if data_size < 1:
             self.done(self.page_offset)

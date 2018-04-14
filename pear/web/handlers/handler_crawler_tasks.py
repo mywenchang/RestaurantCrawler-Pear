@@ -14,8 +14,10 @@ crawler_tasks_router = Blueprint('tasks_router', __name__, url_prefix='/crawler_
 def get_tasks():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 20))
-    status = int(request.args.get('status', None))
+    status = request.args.get('status')
     u_id = request.cookies.get('u_id')
+    if status is not None:
+        status = int(status)
     crawlers, total = CrawlerDao.batch_get_by_status(u_id, page=page, per_page=per_page, status=status)
     return jsonify({'page': page, "per_page": per_page, 'total': total, 'data': crawlers})
 

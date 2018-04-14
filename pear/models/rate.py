@@ -10,13 +10,15 @@ from sqlalchemy.sql import and_
 class RateDao(BaseDao):
 
     @classmethod
-    def create(cls, restaurant_crawler_id, rating_start, rated_at, rating_text, time_spent_desc, restaurant_id):
+    def create(cls, restaurant_crawler_id, rating_start, rated_at, rating_text, time_spent_desc, food_id, food_name,
+               food_star, food_rate, restaurant_id):
         sql = rate.insert().values(
             restaurant_crawler_id=restaurant_crawler_id,
             rating_start=rating_start,
             rated_at=rated_at,
             rating_text=rating_text,
             time_spent_desc=time_spent_desc,
+            food_id=food_id, food_name=food_name, food_star=food_star, food_rate=food_rate,
             restaurant_id=restaurant_id
         )
         return cls.insert(sql)
@@ -46,5 +48,9 @@ class RateDao(BaseDao):
             'rating_text': item.rating_text,
             'time_spent_desc': item.time_spent_desc,
             'restaurant_id': item.restaurant_id,
-            'restaurant_crawler_id': item.restaurant_crwaler_id
+            'restaurant_crawler_id': item.restaurant_crwaler_id,
+            'food_id': item.food_id,
+            'food_name': item.food_name,
+            'food_star': item.food_star,
+            'food_rate': item.food_rate
         }

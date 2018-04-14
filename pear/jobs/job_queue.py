@@ -116,18 +116,17 @@ class Worker(object):
     def on_job(cls, job):
         start = time.time()
         msg = json.loads(job.body)
-        logger.info(msg)
         tube = msg.get('tube')
         func_name = msg.get('func_name')
         try:
             func = Subscriber.FUN_MAP[tube][func_name]
             kwargs = msg.get('kwargs')
+            logger.info(u'run {} args:{}'.format(func_name, kwargs))
             func(**kwargs)
-            logger.info(u'{}-{}'.format(func, kwargs))
         except Exception as e:
             logger.error(e.message, exc_info=True)
         cost = time.time() - start
-        logger.info('{} cost {}s'.format(func_name, cost))
+        logger.info('{} cost {} s'.format(func_name, cost))
 
     @classmethod
     def delete_job(cls, job):
