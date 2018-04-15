@@ -1,7 +1,9 @@
 # coding=utf-8
+from sqlalchemy import func
 
 from pear.models.base import BaseDao
 from pear.models.tables import dish
+from sqlalchemy.sql import select
 
 
 class DishDao(BaseDao):
@@ -17,7 +19,15 @@ class DishDao(BaseDao):
             rating_count=rating_count,
             crawler_id=crawler_id
         )
-        cls.insert(sql)
+        return cls.insert(sql)
+
+    @classmethod
+    def get_by_crawler_id(cls, crawler_id, page=1, per_page=20):
+        sql = select([dish]).where(
+            dish.c.crawler_id == crawler_id
+        )
+        count_sql = select([func.count(dish.c.id)]).where(dish.c.crawler_id == crawler_id)
+        return cls.get_list(sql, page, per_page, count_sql)
 
     @classmethod
     def wrap_item(cls, item):

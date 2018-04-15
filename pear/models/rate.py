@@ -1,10 +1,10 @@
 # coding=utf-8
 
-from sqlalchemy import select
+from sqlalchemy import select, func
+from sqlalchemy.sql import and_
 
 from pear.models.base import BaseDao
 from pear.models.tables import rate
-from sqlalchemy.sql import and_
 
 
 class RateDao(BaseDao):
@@ -38,6 +38,12 @@ class RateDao(BaseDao):
         return cls.get_list(sql, page, per_page)
 
     @classmethod
+    def get_by_crawler_id(cls, crawler_id, page=1, per_page=20):
+        sql = select([rate]).where(rate.c.restaurant_crawler_id == crawler_id)
+        count_sql = select([func.count(rate.c.id)]).where(rate.c.restaurant_crawler_id == crawler_id)
+        return cls.get_list(sql, page, per_page, count_sql)
+
+    @classmethod
     def wrap_item(cls, item):
         if not item:
             return None
@@ -48,7 +54,7 @@ class RateDao(BaseDao):
             'rating_text': item.rating_text,
             'time_spent_desc': item.time_spent_desc,
             'restaurant_id': item.restaurant_id,
-            'restaurant_crawler_id': item.restaurant_crwaler_id,
+            'restaurant_crawler_id': item.restaurant_crawler_id,
             'food_id': item.food_id,
             'food_name': item.food_name,
             'food_star': item.food_star,

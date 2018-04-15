@@ -1,8 +1,11 @@
 # coding=utf-8
 
 from flask import jsonify, Blueprint, request
-
+import json
 from pear.models.crawler import CrawlerDao
+from pear.models.dish import DishDao
+from pear.models.rate import RateDao
+from pear.models.restaurant import RestaurantDao
 from pear.utils.authorize import authorize
 from pear.web.controllers.controller_crawler import commit_crawler_task
 
@@ -27,7 +30,16 @@ def get_tasks():
 def get_crawler(crawler_id=None):
     u_id = request.cookies.get('u_id')
     crawler = CrawlerDao.get_by_id(crawler_id, u_id)
-    return jsonify(data=crawler)
+    restaurant_id = json.loads(crawler.get('args')).get('restaurant').get('id')
+    restaurant = RestaurantDao.get_by_restaurant_id(int(restaurant_id))
+    dishes, dish_total = DishDao.get_by_crawler_id(crawler_id)
+    rate, rate_total = RateDao.get_by_crawler_id(crawler_id)
+    return jsonify(
+        crawler=crawler,
+        dish={'total': dish_total, 'data': dishes},
+        rate={'total': rate_total, 'data': rate},
+        restaurant=restaurant
+    )
 
 
 @crawler_tasks_router.route('', methods=['POST'])
