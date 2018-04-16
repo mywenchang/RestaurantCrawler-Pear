@@ -9,7 +9,7 @@ from sqlalchemy.sql import select
 class DishDao(BaseDao):
 
     @classmethod
-    def create(cls, food_id, restaurant_id, name, rating, moth_sales, rating_count, crawler_id):
+    def create(cls, food_id, restaurant_id, name, rating, moth_sales, rating_count, price, crawler_id):
         sql = dish.insert().values(
             food_id=food_id,
             restaurant_id=restaurant_id,
@@ -17,6 +17,7 @@ class DishDao(BaseDao):
             rating=rating,
             moth_sales=moth_sales,
             rating_count=rating_count,
+            price=price,
             crawler_id=crawler_id
         )
         return cls.insert(sql)
@@ -40,5 +41,6 @@ class DishDao(BaseDao):
             "rating": item.rating,
             "moth_sales": item.moth_sales,
             "rating_count": item.rating_count,
+            "price": item.price,
             "crawler_id": item.crawler_id
         }

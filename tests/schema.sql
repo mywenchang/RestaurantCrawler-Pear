@@ -23,6 +23,7 @@ CREATE TABLE `dish` (
 	`rating` FLOAT UNSIGNED  DEFAULT 0 COMMENT '评价',
 	`moth_sales` INT(11) UNSIGNED DEFAULT 0 COMMENT '月销量',
 	`rating_count` INT(11) UNSIGNED  DEFAULT 0 COMMENT '评价数',
+	`price` FLOAT UNSIGNED  DEFAULT 0 COMMENT '价格',
 	`crawler_id` INT(11) UNSIGNED NOT NULL COMMENT '提交任务的爬虫id',
 	PRIMARY KEY (`id`),
 	KEY `idx_restaurant_id` (`restaurant_id`)

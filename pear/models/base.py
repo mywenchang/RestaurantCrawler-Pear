@@ -20,7 +20,8 @@ class BaseDao(object):
 
     @classmethod
     def get_list(cls, sql, page, per_page, count_sql=None):
-        sql = sql.limit(per_page).offset((page - 1) * per_page)
+        if page != -1:
+            sql = sql.limit(per_page).offset((page - 1) * per_page)
         result = [cls.wrap_item(item) for item in cls.conn.execute(sql).fetchall()]
         count = 0
         if count_sql is not None:
