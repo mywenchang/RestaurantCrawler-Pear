@@ -23,8 +23,11 @@ class RestaurantDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def get_by_restaurant_id(cls, restaurant_id):
+    def get_by_restaurant_id(cls, restaurant_id, **kwargs):
         sql = select([restaurant]).where(restaurant.c.restaurant_id == restaurant_id)
+        if kwargs:
+            for k, v in kwargs.iteritems():
+                sql = sql.where(restaurant.c.k == v)
         return cls.get_one(sql)
 
     @classmethod

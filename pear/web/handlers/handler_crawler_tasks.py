@@ -32,6 +32,8 @@ def get_tasks():
 def get_crawler(crawler_id=None):
     u_id = request.cookies.get('u_id')
     crawler = CrawlerDao.get_by_id(crawler_id, u_id)
+    if not crawler:
+        return jsonify(crawler=None)
     # 商家
     restaurant_id = json.loads(crawler.get('args')).get('restaurant').get('id')
     restaurant = RestaurantDao.get_by_restaurant_id(int(restaurant_id))

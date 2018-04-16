@@ -15,11 +15,13 @@ def install_modules(app):
     from pear.web.handlers.handler_config_ele_crawler import config_ele_crawler_router
     from pear.web.handlers.handler_authorize import authorize_router
     from pear.web.handlers.handler_crawler_tasks import crawler_tasks_router
+    from pear.web.handlers.handler_data_analyse import data_router
     app.register_blueprint(dashboard_router)
     app.register_blueprint(user_router)
     app.register_blueprint(config_ele_crawler_router)
     app.register_blueprint(authorize_router)
     app.register_blueprint(crawler_tasks_router)
+    app.register_blueprint(data_router)
 
 
 def get_application():

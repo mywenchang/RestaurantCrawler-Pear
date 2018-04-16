@@ -58,7 +58,7 @@ class CrawlEleDishes(BaseCrawler):
                 rating = food_item.get('rating'),
                 month_sales = food_item.get('month_sales'),
                 rating_count = food_item.get('rating_count')
-                food_id = food_item.get('food_id')
+                food_id = food_item.get('specfoods')[0].get('food_id')
                 price = food_item.get('specfoods')[0].get('price')
                 DishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, price, self.id)
                 total += 1
