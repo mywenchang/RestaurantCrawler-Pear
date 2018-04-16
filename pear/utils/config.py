@@ -1,7 +1,7 @@
 import os
 
 config = {
-    'mysql': 'mysql+pymysql://root:root@localhost/db_pear?charset=utf8',
+    'mysql': 'mysql+pymysql://{}?charset=utf8'.format(os.getenv('pear_web_mysql')),
     'beanstalk': {
         'host': '0.0.0.0',
         'port': 11300
