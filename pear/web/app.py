@@ -2,14 +2,11 @@
 
 import logging
 
-from flask import Flask, request, send_file
-from flask_swagger_ui import get_swaggerui_blueprint
+from flask import Flask, request, jsonify
 
 from pear.utils.config import IS_DEBUG
 
 logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
-SWAGGER_URL = '/doc'
-SWAGGER_API_LOCATION = './swagger.yaml'
 
 
 def install_modules(app):
@@ -23,9 +20,6 @@ def install_modules(app):
     app.register_blueprint(config_ele_crawler_router)
     app.register_blueprint(authorize_router)
     app.register_blueprint(crawler_tasks_router)
-    swagger_ui_blueprint = get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_API_LOCATION,
-                                                   config={'app_name': u'数据分析后台接口文档'})
-    app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
 
 def get_application():
@@ -33,13 +27,9 @@ def get_application():
     install_modules(app)
     app.secret_key = "pear_web_secret_key"
 
-    @app.route("/check_health", methods=["GET"])
-    def check_health():
-        return 'OK'
-
-    @app.route('/doc/swagger.yaml')
-    def swagger_doc():
-        return send_file('static/swagger.yaml')
+    @app.route("/")
+    def index():
+        return jsonify(status='ok')
 
     @app.before_request
     def before_request():

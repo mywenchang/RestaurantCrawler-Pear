@@ -16,7 +16,6 @@ setup(
         "pymysql",
         "beanstalkc",
         "PyYAML",
-        "flask-swagger-ui",
         "gunicorn",
         'mock',
         'pytest'
