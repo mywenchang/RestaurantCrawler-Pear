@@ -35,12 +35,16 @@ def get_application():
 
     @app.before_request
     def before_request():
-        logging.info('visitor: '.format(request.environ.get('HTTP_X_REAL_IP', request.remote_addr)))
+        origin = request.headers.get('origin')
+        address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        logging.info(u'{}:{} {}'.format(origin, address, request.method))
+        logging.info(u'{}'.format(request.data))
 
     @app.after_request
     def after_request(response):
         # 允许跨域(Access-Control-Allow-Credentials 为 true 时，值不能为*，必须为指定的 protocol://host:port)
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+        origin = request.headers.get('origin')
+        response.headers.add('Access-Control-Allow-Origin', origin)
         # 和前端 fetch 的credentials选项配合，使其可以获取cookie
         response.headers.add('Access-Control-Allow-Credentials', 'true')
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
@@ -54,4 +58,4 @@ application = get_application()
 
 
 def main():
-    application.run(debug=IS_DEBUG, port=9999, host='0.0.0.0')
+    application.run(debug=IS_DEBUG, port=7777, host='0.0.0.0')

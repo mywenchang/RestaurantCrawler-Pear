@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `restaurant`;
-CREATE TABLE `restaurant` (
+DROP TABLE IF EXISTS `ele_restaurant`;
+CREATE TABLE `ele_restaurant` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
 	`restaurant_id` INT(11) UNSIGNED COMMENT '商家id，来自数据源',
 	`name` VARCHAR(100) DEFAULT NULL COMMENT '商家名称',
@@ -14,8 +14,8 @@ CREATE TABLE `restaurant` (
 	KEY `idx_restaurant_id` (`restaurant_id`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-DROP TABLE IF EXISTS `dish`;
-CREATE TABLE `dish` (
+DROP TABLE IF EXISTS `ele_dish`;
+CREATE TABLE `ele_dish` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
 	`food_id` INT(11) UNSIGNED COMMENT '菜品id',
 	`restaurant_id` INT(11) UNSIGNED COMMENT 'restaurant 表中的 id',
@@ -59,9 +59,10 @@ CREATE TABLE `user` (
 	KEY `idx_mobile_passwd` (`mobile`, `passwd`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-DROP TABLE IF EXISTS `rate`;
-CREATE TABLE `rate` (
+DROP TABLE IF EXISTS `ele_rate`;
+CREATE TABLE `ele_rate` (
     `id` INT(11) UNSIGNED AUTO_INCREMENT,
+    `rating_id` INT(10),
     `rating_start` INT(1),
     `rated_at` VARCHAR(50),
     `rating_text` TEXT,

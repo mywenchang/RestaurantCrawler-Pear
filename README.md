@@ -28,6 +28,19 @@
 
 
 # Api
-- 登录注册 `/auth/login` `auth/signup`
-- 登录饿了么
-    - `/config_ele_crawler/login_ele`
+
+- 登录注册 `auth/login` `auth/signup` POST
+
+----
+
+- 获取饿了么登录短信验证码 `config_ele_crawler/sms_code` GET
+- 登录饿了么 `config_ele_crawler/login_ele` GET
+- 搜索饿了么地点 `config_ele_crawler/search_address` GET
+- 获取饿了么商家 `config_ele_crawler/get_restaurants` GET
+
+---
+
+- 提交爬虫任务 `crawler/task` POST
+- 获取所有爬虫任务 `crawler/task` GET
+- 获取单条爬虫任务 `crawler/task/<int:crawler_id>` GET
+- 删除任务 `crawler/task/<int:crawler_id>` DELETE

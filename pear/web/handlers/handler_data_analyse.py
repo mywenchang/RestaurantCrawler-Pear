@@ -3,8 +3,8 @@ from flask import Blueprint
 from flask import jsonify
 from flask.app import request
 
-from pear.models.dish import DishDao
-from pear.models.rate import RateDao
+from pear.models.dish import EleDishDao
+from pear.models.rate import EleRateDao
 
 data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
 
@@ -12,7 +12,7 @@ data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
 # 店铺单品分布
 @data_router.route('/dish_distribution/<int:crawler_id>')
 def sale_distribution(crawler_id):
-    dish, total = DishDao.get_by_crawler_id(crawler_id, page=-1)
+    dish, total = EleDishDao.get_by_crawler_id(crawler_id, page=-1)
 
     def render_item(k):
         return sorted([
@@ -21,7 +21,9 @@ def sale_distribution(crawler_id):
                 'food_name': item['name'],
                 'value': item[k]
             }
-            for item in dish], key=lambda d: d['value'])
+            for item in dish],
+            key=lambda d: d['value'],
+            reverse=True)
 
     # 销量分布
     sales = render_item('moth_sales')
@@ -44,5 +46,12 @@ def sale_distribution(crawler_id):
 def restaurant_rating_distribution():
     restaurant_id = request.args.get('restaurant_id')
     crawler_id = request.args.get('crawler_id')
-    rate = RateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
+    rate = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
     return jsonify(data=rate)
+
+
+# 支付笔数分布
+@data_router.route('/total_sale/<int:crawler_id>')
+def total_sale(crawler_id):
+    rate, total = EleRateDao.get_by_crawler_id(crawler_id, page=-1)
+    return jsonify()

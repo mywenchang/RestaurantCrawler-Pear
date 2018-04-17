@@ -5,8 +5,9 @@ import logging
 import requests
 
 from pear.crawlers.base import BaseCrawler
-from pear.models.dish import DishDao
-from pear.models.rate import RateDao
+from pear.models.dish import EleDishDao
+from pear.models.rate import EleRateDao
+import time
 
 logger = logging.getLogger('')
 
@@ -60,7 +61,7 @@ class CrawlEleDishes(BaseCrawler):
                 rating_count = food_item.get('rating_count')
                 food_id = food_item.get('specfoods')[0].get('food_id')
                 price = food_item.get('specfoods')[0].get('price')
-                DishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, price, self.id)
+                EleDishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, price, self.id)
                 total += 1
                 self.update_count(total)
 
@@ -80,7 +81,7 @@ class CrawlerEleShopRate(BaseCrawler):
         self.restaurant_id = restaurant.get('id')
         self.latitude = args.get('latitude')
         self.longitude = args.get('longitude')
-        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
+        self.url = 'https://www.ele.me/restapi/ugc/v1/ele_restaurant/{}/ratings'.format(self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),
@@ -112,6 +113,7 @@ class CrawlerEleShopRate(BaseCrawler):
             return
         data = response.json()
         for item in data:
+            rating_id = int(time.time())
             rating_star = item.get('rating_star')
             rated_at = item.get('rated_at')
             rating_text = item.get('rating_text')
@@ -122,8 +124,9 @@ class CrawlerEleShopRate(BaseCrawler):
                 food_name = food.get('rate_name')
                 food_star = food.get('rating_star')
                 food_rate = food.get('rating_text')
-                RateDao.create(self.restaurant_crawler_id, rating_star, rated_at, rating_text, time_spent_desc,
-                               food_id, food_name, food_star, food_rate, self.restaurant_id)
+                EleRateDao.create(self.restaurant_crawler_id, rating_id, rating_star, rated_at, rating_text,
+                                  time_spent_desc,
+                                  food_id, food_name, food_star, food_rate, self.restaurant_id)
         data_size = len(data)
         if data_size < 1:
             self.done(self.page_offset)

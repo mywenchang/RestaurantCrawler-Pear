@@ -4,7 +4,7 @@ import requests
 
 from pear.crawlers import CRAWLER_TYPES, CRAWLERS
 from pear.jobs.job_queue import JobQueue
-from pear.models.restaurant import RestaurantDao
+from pear.models.restaurant import EleRestaurantDao
 from pear.utils.const import SOURCE
 from pear.utils.logger import logger
 
@@ -155,10 +155,10 @@ def commit_crawler_task(source, cookies, args):
 
 @queue.task('crawlers')
 def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
-    restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id)
+    restaurant = EleRestaurantDao.get_by_restaurant_id(restaurant_id)
     if restaurant:
-        RestaurantDao.update_by_restaurant_id(restaurant_id, name=name, source=source, sales=sales,
-                                              arrive_time=arrive_time, send_fee=send_fee, score=score,
-                                              latitude=latitude, longitude=longitude)
+        EleRestaurantDao.update_by_restaurant_id(restaurant_id, name=name, source=source, sales=sales,
+                                                 arrive_time=arrive_time, send_fee=send_fee, score=score,
+                                                 latitude=latitude, longitude=longitude)
     else:
-        RestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)
+        EleRestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)

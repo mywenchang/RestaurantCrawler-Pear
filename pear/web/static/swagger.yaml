@@ -131,9 +131,9 @@ paths: # 声明路径
                 type:
                   type: string
                   enum:
-                    - restaurant
-                    - dish
-                    - rate
+                    - ele_restaurant
+                    - ele_dish
+                    - ele_rate
                   description: >
                     爬取的数据类型:
                       * `restaurant`

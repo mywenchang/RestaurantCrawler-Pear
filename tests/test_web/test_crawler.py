@@ -24,7 +24,7 @@ class TestCrawler(unittest.TestCase):
         request_data = [{
             'latitude': 1,
             'longitude': 2,
-            'restaurant': {
+            'ele_restaurant': {
                 'id': 1,
                 'latitude': 2,
                 'longitude': 3

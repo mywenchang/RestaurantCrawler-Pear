@@ -13,9 +13,9 @@ def authorize(func):
     def wrapper(*args, **kwargs):
         u_id = request.cookies.get('u_id')
         name = session.get(u_id)
-        logger.info('authorize u_id={} name={}'.format(u_id, name))
+        logger.info(u'authorize u_id={} name={}'.format(u_id, name))
         if not name:
-            return jsonify(message="Need Log"), 401
+            return jsonify(message=u"需要登录"), 401
         return func(*args, **kwargs)
 
     return wrapper
