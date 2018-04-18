@@ -1,22 +1,18 @@
 # coding=utf-8
 
-import logging
-
 from flask import Flask, request, jsonify
 
+from pear.models.base import BaseDao
 from pear.utils.config import IS_DEBUG
-
-logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
+from pear.utils.logger import logger
 
 
 def install_modules(app):
-    from pear.web.handlers.handler_dashboard import dashboard_router
     from pear.web.handlers.handler_user import user_router
     from pear.web.handlers.handler_config_ele_crawler import config_ele_crawler_router
     from pear.web.handlers.handler_authorize import authorize_router
     from pear.web.handlers.handler_crawler_tasks import crawler_tasks_router
     from pear.web.handlers.handler_data_analyse import data_router
-    app.register_blueprint(dashboard_router)
     app.register_blueprint(user_router)
     app.register_blueprint(config_ele_crawler_router)
     app.register_blueprint(authorize_router)
@@ -37,8 +33,7 @@ def get_application():
     def before_request():
         origin = request.headers.get('origin')
         address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-        logging.info(u'{}:{} {}'.format(origin, address, request.method))
-        logging.info(u'{}'.format(request.data))
+        logger.info(u'origin: {}, address:{}, method:{}'.format(origin, address, request.method))
 
     @app.after_request
     def after_request(response):
@@ -50,6 +45,8 @@ def get_application():
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
         response.headers.add('Access-Control-Allow-Headers', 'content-type, accept, Access-Control-Allow-Origin')
         return response
+
+
 
     return app
 

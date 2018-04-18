@@ -3,11 +3,12 @@ import json
 import logging
 
 import requests
+import time
 
 from pear.crawlers.base import BaseCrawler
 from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
-import time
+from pear.models.user_log import UserLogDao
 
 logger = logging.getLogger('')
 
@@ -16,6 +17,7 @@ logger = logging.getLogger('')
 class CrawlEleDishes(BaseCrawler):
     def __init__(self, c_type, cookies, args=None):
         super(CrawlEleDishes, self).__init__(c_type, cookies, args)
+        UserLogDao.create(self.u_id, u'创建饿了么爬虫')
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
         self.args = args
         if not args:
@@ -74,6 +76,7 @@ class CrawlEleDishes(BaseCrawler):
 class CrawlerEleShopRate(BaseCrawler):
     def __init__(self, c_type, cookies, restaurant_crawler_id, args=None):
         super(CrawlerEleShopRate, self).__init__(c_type, cookies, args)
+        UserLogDao.create(self.u_id, u'创建饿了么评论爬虫')
         self.page_size = 10
         self.page_offset = 0
         self.restaurant_crawler_id = restaurant_crawler_id

@@ -28,6 +28,8 @@ class UserDao(BaseDao):
     @classmethod
     def get_by_args(cls, password, account=None):
         sql = select([user]).where(user.c.passwd == password)
+        if account is None:
+            return None
         if account:
             sql = sql.where(
                 or_(
@@ -57,6 +59,14 @@ class UserDao(BaseDao):
         return cls.update(sql)
 
     @classmethod
+    def add_visitor_count(cls, u_id):
+        count = cls.get_by_id(u_id)['visitor_count']
+        sql = user.update().where(user.c.id == u_id).values(
+            visitor_count=count + 1
+        )
+        return cls.update(sql)
+
+    @classmethod
     def wrap_item(cls, item):
         if not item:
             return None
@@ -64,5 +74,6 @@ class UserDao(BaseDao):
             'name': item.name,
             'mobile': item.mobile,
             'email': item.email,
-            'id': item.id
+            'id': item.id,
+            'visitor_count': item.visitor_count
         }

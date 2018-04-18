@@ -53,6 +53,7 @@ CREATE TABLE `user` (
 	`passwd` varchar(16),
 	`email` varchar(50),
 	`mobile` varchar(20),
+	`visitor_count` INT(11) DEFAULT 0,
 	PRIMARY KEY (`id`),
 	KEY `idx_name_passwd` (`name`, `passwd`),
 	KEY `idx_email_passwd` (`email`, `passwd`),
@@ -77,4 +78,15 @@ CREATE TABLE `ele_rate` (
     KEY `idx_restaurant_crawler_food_id` (`restaurant_id`, `restaurant_crawler_id`, `food_id`),
     KEY `idx_restaurant_id_rating_start` (`restaurant_id`, `rating_start`),
     KEY `idx_food` (`food_id`)
+) ENGINE = InnoDB CHARSET = utf8;
+
+DROP TABLE IF EXISTS `user_log`;
+CREATE TABLE `user_log` (
+    `id` INT(11) UNSIGNED AUTO_INCREMENT,
+    `user_id` INT(11) NOT NULL COMMENT '用户 id ,对应 user 表中 id',
+    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `action_name` TEXT NOT NULL,
+    `action_args` TEXT DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`)
 ) ENGINE = InnoDB CHARSET = utf8;

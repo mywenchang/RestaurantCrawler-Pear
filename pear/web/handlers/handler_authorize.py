@@ -5,6 +5,7 @@ import json
 from flask import Blueprint, request, jsonify, session, Response
 
 from pear.models.user import UserDao
+from pear.utils.logger import logger
 
 authorize_router = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -14,8 +15,6 @@ def login():
     data = request.json
     password = data.get('password')
     account = data.get('account')
-    if not UserDao.is_exist(mobile=account):
-        return jsonify(status='false', message=u'{} 不存在'.format(account)), 401
     user = UserDao.get_by_args(password, account)
     if not user:
         return jsonify(status='false', message=u'密码错误'), 401
@@ -25,10 +24,18 @@ def login():
     return resp
 
 
+@authorize_router.route('/logout')
+def logout():
+    u_id = request.cookies.get('u_id')
+    if u_id:
+        session.pop(u_id, None)
+    return jsonify(status='ok')
+
+
 @authorize_router.route('/signup', methods=['POST'])
 def signup():
     data = request.json
-    email = data.get('email')
+    email = data.get('mail')
     name = data.get('name')
     mobile = data.get('mobile')
     password = data.get('password')

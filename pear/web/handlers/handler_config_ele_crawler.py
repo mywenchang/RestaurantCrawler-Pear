@@ -3,7 +3,7 @@ import json
 import logging
 
 from flask import jsonify, Blueprint, request, Response
-
+from pear.models.user_log import UserLogDao
 from pear.utils.authorize import authorize
 from pear.web.controllers.controller_crawler import get_ele_msg_code, login_ele_by_mobile, get_ele_captchas, \
     get_ele_city_list, search_ele_address, get_ele_restaurants
@@ -45,6 +45,8 @@ def get_sms_code():
 @config_ele_crawler_router.route('/login_ele', methods=['GET'])
 @authorize
 def login_ele():
+    u_id = request.cookies.get('u_id')
+    UserLogDao.create(u_id, u'登录饿了么')
     mobile = request.args.get('mobile')
     sms_code = request.args.get('ele_sms_code', '')
     sms_token = request.args.get('ele_sms_token', '')

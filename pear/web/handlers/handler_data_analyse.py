@@ -41,17 +41,29 @@ def sale_distribution(crawler_id):
     })
 
 
-# 店铺总评论分布
+# 店铺评论数时间分布
 @data_router.route('/rating_distribution')
 def restaurant_rating_distribution():
     restaurant_id = request.args.get('restaurant_id')
     crawler_id = request.args.get('crawler_id')
     rate = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
-    return jsonify(data=rate)
+    data = {}
+    for item in rate:
+        rate_at = item['rate_at']
+        data.setdefault(rate_at, 0)
+        data[rate_at] += 1
+    return jsonify(data)
 
 
-# 支付笔数分布
-@data_router.route('/total_sale/<int:crawler_id>')
-def total_sale(crawler_id):
-    rate, total = EleRateDao.get_by_crawler_id(crawler_id, page=-1)
-    return jsonify()
+# 店铺评论得分分布
+@data_router.route('/rating_score_distribution')
+def rating_score_distribution():
+    restaurant_id = request.args.get('restaurant_id')
+    crawler_id = request.args.get('crawler_id')
+    rate = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
+    data = {}
+    for item in rate:
+        rate = item['food_rate']
+        data.setdefault(rate, 0)
+        data[rate] += 1
+    return jsonify(data)

@@ -2,19 +2,15 @@
 from functools import wraps
 
 from flask import session, request, jsonify
-import logging
-
-logging.basicConfig(format='%(levelname)s %(asctime)s %(filename)s %(lineno)d %(message)s', level=logging.INFO)
-logger = logging.getLogger('')
+from pear.utils.logger import logger
 
 
 def authorize(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         u_id = request.cookies.get('u_id')
-        name = session.get(u_id)
-        logger.info(u'authorize u_id={} name={}'.format(u_id, name))
-        if not name:
+        logger.info('authorize user_id {}'.format(u_id))
+        if not u_id or session.get(u_id) is None:
             return jsonify(message=u"需要登录"), 401
         return func(*args, **kwargs)
 
