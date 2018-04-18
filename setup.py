@@ -18,7 +18,8 @@ setup(
         "PyYAML",
         "gunicorn",
         'mock',
-        'pytest'
+        'pytest',
+        'coloredlogs'
     ],
     entry_points={
         'console_scripts': [

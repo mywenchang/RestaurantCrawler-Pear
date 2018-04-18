@@ -10,8 +10,8 @@ data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
 
 
 # 店铺单品分布
-@data_router.route('/dish_distribution/<int:crawler_id>')
-def sale_distribution(crawler_id):
+@data_router.route('/dish_distribution/<int:crawler_id>/<int:restaurant_id>')
+def sale_distribution(crawler_id, restaurant_id):
     dish, total = EleDishDao.get_by_crawler_id(crawler_id, page=-1)
 
     def render_item(k):
@@ -42,28 +42,24 @@ def sale_distribution(crawler_id):
 
 
 # 店铺评论数时间分布
-@data_router.route('/rating_distribution')
-def restaurant_rating_distribution():
-    restaurant_id = request.args.get('restaurant_id')
-    crawler_id = request.args.get('crawler_id')
-    rate = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
+@data_router.route('/rating_distribution/<int:crawler_id>/<int:restaurant_id>')
+def restaurant_rating_distribution(crawler_id, restaurant_id):
+    rate, total = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
     data = {}
     for item in rate:
-        rate_at = item['rate_at']
+        rate_at = item['rated_at']
         data.setdefault(rate_at, 0)
         data[rate_at] += 1
     return jsonify(data)
 
 
 # 店铺评论得分分布
-@data_router.route('/rating_score_distribution')
-def rating_score_distribution():
-    restaurant_id = request.args.get('restaurant_id')
-    crawler_id = request.args.get('crawler_id')
-    rate = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
+@data_router.route('/rating_score_distribution/<int:crawler_id>/<int:restaurant_id>')
+def rating_score_distribution(crawler_id, restaurant_id):
+    rate, total = EleRateDao.get_by_restaurant_id(crawler_id, restaurant_id, page=-1)
     data = {}
     for item in rate:
-        rate = item['food_rate']
+        rate = item['food_star']
         data.setdefault(rate, 0)
         data[rate] += 1
     return jsonify(data)

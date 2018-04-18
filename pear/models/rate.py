@@ -32,11 +32,15 @@ class EleRateDao(BaseDao):
                 ele_rate.c.restaurant_crawler_id == restaurant_crawler_id
             )
         )
+        count_sql = select([func.count(ele_rate.c.id)]).where(
+            and_(
+                ele_rate.c.restaurant_crawler_id == restaurant_crawler_id,
+                ele_rate.c.restaurant_id == restaurant_id
+            ))
         if rating_start > 0:
-            sql = sql.where(
-                ele_rate.c.rating_start == rating_start
-            )
-        return cls.get_list(sql, page, per_page)
+            sql = sql.where(ele_rate.c.rating_start == rating_start)
+            count_sql.where(ele_rate.c.rating_start == restaurant_id)
+        return cls.get_list(sql, page, per_page, count_sql)
 
     @classmethod
     def get_by_crawler_id(cls, crawler_id, page=1, per_page=20):

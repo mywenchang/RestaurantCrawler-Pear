@@ -19,7 +19,6 @@ def get_user_info():
     return jsonify(user)
 
 
-# user/activity
 @user_router.route('/activity')
 @authorize
 def get_user_activity():

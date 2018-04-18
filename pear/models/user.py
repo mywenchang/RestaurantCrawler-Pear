@@ -75,5 +75,6 @@ class UserDao(BaseDao):
             'mobile': item.mobile,
             'email': item.email,
             'id': item.id,
-            'visitor_count': item.visitor_count
+            'visitor_count': item.visitor_count,
+            'used_days': (datetime.now() - item.created).days + 1
         }

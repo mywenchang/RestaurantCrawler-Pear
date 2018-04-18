@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import json
 from datetime import datetime
 from sqlalchemy import update, select, and_, func
 
@@ -78,7 +79,7 @@ class CrawlerDao(BaseDao):
             'status': item.status,
             'created': item.created.strftime('%Y-%d-%m %H:%M:%S'),
             'finished': item.finished.strftime('%Y-%d-%m %H:%M:%S') if item.finished else '',
-            'args': item.args,
+            'args': json.loads(item.args) if item.args else None,
             'info': item.info,
             'extras': item.extras,
             'total': item.total,

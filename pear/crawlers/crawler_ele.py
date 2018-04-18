@@ -84,7 +84,7 @@ class CrawlerEleShopRate(BaseCrawler):
         self.restaurant_id = restaurant.get('id')
         self.latitude = args.get('latitude')
         self.longitude = args.get('longitude')
-        self.url = 'https://www.ele.me/restapi/ugc/v1/ele_restaurant/{}/ratings'.format(self.restaurant_id)
+        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),

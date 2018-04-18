@@ -13,23 +13,29 @@ class BaseDao(object):
 
     @classmethod
     def update(cls, sql):
-        cls.__conn.execute(sql)
+        result_proxy = cls.__conn.execute(sql)
+        result_proxy.close()
 
     @classmethod
     def get_one(cls, sql):
         result = cls.__conn.execute(sql)
-        if result.row_count:
+        if result.returns_rows:
             return cls.wrap_item(result.first())
+        result.close()
         return None
 
     @classmethod
     def get_list(cls, sql, page, per_page, count_sql=None):
         if page != -1:
             sql = sql.limit(per_page).offset((page - 1) * per_page)
-        result = [cls.wrap_item(item) for item in cls.__conn.execute(sql).fetchall()]
+        result_proxy = cls.__conn.execute(sql)
+        result = [cls.wrap_item(item) for item in result_proxy.fetchall()]
+        result_proxy.close()
         count = 0
         if count_sql is not None:
-            count = cls.__conn.execute(count_sql).fetchone()[0]
+            result_proxy = cls.__conn.execute(count_sql)
+            count = result_proxy.fetchone()[0]
+            result_proxy.close()
         return result, count
 
     @classmethod

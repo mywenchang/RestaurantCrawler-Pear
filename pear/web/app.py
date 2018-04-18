@@ -2,7 +2,6 @@
 
 from flask import Flask, request, jsonify
 
-from pear.models.base import BaseDao
 from pear.utils.config import IS_DEBUG
 from pear.utils.logger import logger
 
@@ -45,8 +44,6 @@ def get_application():
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
         response.headers.add('Access-Control-Allow-Headers', 'content-type, accept, Access-Control-Allow-Origin')
         return response
-
-
 
     return app
 
