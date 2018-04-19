@@ -7,17 +7,20 @@ from sqlalchemy import update, select, and_, func
 from pear.models.base import BaseDao
 from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
+from pear.models.restaurant import EleRestaurantDao
+from pear.models.dish import EleDishDao
 
 
 class CrawlerDao(BaseDao):
 
     @classmethod
-    def create(cls, u_id, type, args, info=None, extras=None):
+    def create(cls, u_id, source, type, args=None, info=None, extras=None):
         sql = crawler.insert().values(
             status=Crawler_Status.Crawling,
             created=datetime.now(),
             u_id=u_id,
-            type=type
+            type=type,
+            source=source
         )
         if args is not None:
             sql = sql.values(args=args)
@@ -74,15 +77,26 @@ class CrawlerDao(BaseDao):
     def wrap_item(cls, item):
         if not item:
             return None
+        args = json.loads(item.args) if item.args else None
+        restaurant = []
+        dishes = []
+        if args:
+            restaurant = args.get('restaurant')
+            if restaurant:
+                restaurant = EleRestaurantDao.get_by_restaurant_id(restaurant.get('id'), source=item.source)
+        dishes, total = EleDishDao.get_by_crawler_id(item.id)
         return {
             'id': item.id,
-            'status': item.status,
+            'status': item.status if item.data_count > 0 else 2,
             'created': item.created.strftime('%Y-%d-%m %H:%M:%S'),
             'finished': item.finished.strftime('%Y-%d-%m %H:%M:%S') if item.finished else '',
-            'args': json.loads(item.args) if item.args else None,
+            'args': args,
+            'restaurant': restaurant,
+            'dishes': dishes,
             'info': item.info,
             'extras': item.extras,
             'total': item.total,
             'count': item.data_count,
-            'type': item.type
+            'type': item.type,
+            'source': item.source
         }

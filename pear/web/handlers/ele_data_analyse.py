@@ -1,12 +1,26 @@
 # coding=utf-8
 from flask import Blueprint
 from flask import jsonify
-from flask.app import request
 
 from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
+from pear.models.restaurant import EleRestaurantDao
 
 data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
+
+__RestaurantDaoS = {
+    1: EleRestaurantDao
+}
+
+
+# 获取店铺
+@data_router.route('/restaurant/<int:source>/<int:restaurant_id>')
+def get_restaurant(source, restaurant_id):
+    Dao = __RestaurantDaoS.get(source)
+    restaurant = None
+    if Dao:
+        restaurant = Dao.get_by_restaurant_id(restaurant_id)
+    return jsonify(restaurant)
 
 
 # 店铺单品分布

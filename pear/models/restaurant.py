@@ -23,8 +23,10 @@ class EleRestaurantDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def get_by_restaurant_id(cls, restaurant_id):
+    def get_by_restaurant_id(cls, restaurant_id, source=None):
         sql = select([ele_restaurant]).where(ele_restaurant.c.restaurant_id == restaurant_id)
+        if source is not None:
+            sql = sql.where(ele_restaurant.c.source == source)
         return cls.get_one(sql)
 
     @classmethod

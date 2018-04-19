@@ -10,10 +10,10 @@ logger = logging.getLogger('')
 
 
 class BaseCrawler(object):
-    def __init__(self, c_type, cookies, args):
+    def __init__(self, source, c_type, cookies, args):
         self.cookies = cookies
         self.u_id = cookies.get('u_id')
-        self.id = CrawlerDao.create(self.u_id, c_type, args=json.dumps(args))
+        self.id = CrawlerDao.create(self.u_id, source, c_type, args=json.dumps(args))
 
     def crawl(self):
         raise NotImplemented

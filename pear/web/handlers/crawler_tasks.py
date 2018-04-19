@@ -1,7 +1,5 @@
 # coding=utf-8
 
-import json
-
 from flask import jsonify, Blueprint, request
 
 from pear.models.crawler import CrawlerDao
@@ -9,7 +7,7 @@ from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
 from pear.models.restaurant import EleRestaurantDao
 from pear.utils.authorize import authorize
-from pear.web.controllers.controller_crawler import commit_crawler_task
+from pear.web.controllers.ele_crawler_controller import commit_crawler_task
 
 crawler_tasks_router = Blueprint('tasks_router', __name__, url_prefix='/crawler_tasks')
 

@@ -23,7 +23,7 @@ class EleDishDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def get_by_crawler_id(cls, crawler_id, page=1, per_page=20):
+    def get_by_crawler_id(cls, crawler_id, page=-1, per_page=20):
         sql = select([ele_dish]).where(
             ele_dish.c.crawler_id == crawler_id
         )

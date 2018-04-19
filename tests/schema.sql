@@ -42,6 +42,7 @@ CREATE TABLE `crawler` (
 	`data_count` INT(11) UNSIGNED DEFAULT 0 COMMENT '当前获取到的数据量',
 	`total` INT(11) UNSIGNED DEFAULT 0 COMMENT '总数据量',
 	`type` INT(1) UNSIGNED COMMENT '爬虫类型',
+	`source` INT(1) COMMENT '数据来源',
 	PRIMARY KEY (`id`)
 ) ENGINE = InnoDB CHARSET = utf8;
 

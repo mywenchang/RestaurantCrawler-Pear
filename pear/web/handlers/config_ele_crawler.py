@@ -1,16 +1,14 @@
 # coding=utf-8
 import json
-import logging
 
 from flask import jsonify, Blueprint, request, Response
+
 from pear.models.user_log import UserLogDao
 from pear.utils.authorize import authorize
-from pear.web.controllers.controller_crawler import get_ele_msg_code, login_ele_by_mobile, get_ele_captchas, \
+from pear.web.controllers.ele_crawler_controller import get_ele_msg_code, login_ele_by_mobile, get_ele_captchas, \
     get_ele_city_list, search_ele_address, get_ele_restaurants
 
 config_ele_crawler_router = Blueprint('config_ele_crawler', __name__, url_prefix='/config_ele_crawler')
-
-logger = logging.getLogger('')
 
 # ------------------登录饿了么-----------------
 
@@ -26,7 +24,6 @@ logger = logging.getLogger('')
 def get_pic_code():
     mobile = request.args.get('mobile')
     ele_image_base64, ele_image_token = get_ele_captchas(mobile)
-    logging.info(u'饿了么图片验证码:{}\n{}'.format(ele_image_base64, ele_image_token))
     return jsonify(success=True, ele_image_base64=ele_image_base64, ele_image_token=ele_image_token)
 
 
@@ -35,8 +32,8 @@ def get_pic_code():
 @authorize
 def get_sms_code():
     mobile = request.args.get('mobile')
-    pic_code = request.args.get('ele_pic_code', '')
-    image_token = request.args.get('ele_image_token', '')
+    pic_code = request.args.get('pic_code', '')
+    image_token = request.args.get('pic_token', '')
     success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
     return jsonify(success=success, ele_sms_token=ele_sms_token, message=msg)
 
@@ -48,8 +45,8 @@ def login_ele():
     u_id = request.cookies.get('u_id')
     UserLogDao.create(u_id, u'登录饿了么')
     mobile = request.args.get('mobile')
-    sms_code = request.args.get('ele_sms_code', '')
-    sms_token = request.args.get('ele_sms_token', '')
+    sms_code = request.args.get('sms_code', '')
+    sms_token = request.args.get('sms_token', '')
     success, cookies, content = login_ele_by_mobile(mobile, sms_code, sms_token)
     data = json.dumps({
         'success': True
@@ -60,7 +57,7 @@ def login_ele():
             resp.set_cookie(i, v)
         resp.set_cookie('ele_has_login', '1')
         return resp
-    return jsonify(success=False)
+    return jsonify(success=False, message=content)
 
 
 # --------------------------------------------
