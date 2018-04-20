@@ -30,7 +30,7 @@ def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
         if resp.status_code == 200:
             token = data.get('validate_token', '')
             return True, token, ''
-        msg = data
+        msg = data.get('message')
         return False, token, msg
     except Exception as e:
         msg = e.message.__str__()

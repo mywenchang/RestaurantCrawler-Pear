@@ -90,16 +90,6 @@ def ele_restaurants():
     address = request.json
     offset = 0
     limit = 24
-    result = []
-    ids = set()
-    while True:
-        data = get_ele_restaurants(address.get('geohash'), address.get('latitude'), address.get('longitude'),
-                                   offset=offset, limit=limit, cookies=cookies)
-        if data:
-            for item in data:
-                if item.get('id') not in ids:
-                    result.append(item)
-                    ids.add(item.get('id'))
-            offset += limit
-        else:
-            return jsonify(result)
+    data = get_ele_restaurants(address.get('geohash'), address.get('latitude'), address.get('longitude'), offset=offset,
+                               limit=limit, cookies=cookies)
+    return jsonify(data)

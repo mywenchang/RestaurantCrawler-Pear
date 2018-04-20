@@ -11,9 +11,11 @@ def install_modules(app):
     from pear.web.handlers.config_ele_crawler import config_ele_crawler_router
     from pear.web.handlers.authorize import authorize_router
     from pear.web.handlers.crawler_tasks import crawler_tasks_router
+    from pear.web.handlers.config_meituan_crawler import config_mt_crawler_router
     from pear.web.handlers.ele_data_analyse import data_router
     app.register_blueprint(user_router)
     app.register_blueprint(config_ele_crawler_router)
+    app.register_blueprint(config_mt_crawler_router)
     app.register_blueprint(authorize_router)
     app.register_blueprint(crawler_tasks_router)
     app.register_blueprint(data_router)
@@ -44,8 +46,6 @@ def get_application():
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
         response.headers.add('Access-Control-Allow-Headers', 'content-type, accept, Access-Control-Allow-Origin')
         return response
-
-    logger.info(app.url_map)
 
     return app
 

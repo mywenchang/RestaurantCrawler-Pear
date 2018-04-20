@@ -19,7 +19,8 @@ setup(
         "gunicorn",
         'mock',
         'pytest',
-        'coloredlogs'
+        'coloredlogs',
+        'selenium'
     ],
     entry_points={
         'console_scripts': [
