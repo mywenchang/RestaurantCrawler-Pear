@@ -50,6 +50,9 @@ def get_crawler(crawler_id=None):
 @crawler_tasks_router.route('', methods=['POST'])
 @authorize
 def create_crawler():
+    source = request.args.get('source')
+    if source not in ['ele', 'meituan']:
+        return jsonify(succcess=False)
     try:
         cookies = request.cookies
         data_list = request.json
@@ -59,11 +62,15 @@ def create_crawler():
             if not data.get('restaurant') or not latitude or not longitude:
                 return jsonify(success=False), 404
             args = {
-                'restaurant': data.get('restaurant'),
+                'restaurant': {
+                    'id': data.get('restaurant').get('id'),
+                    'latitude': data.get('restaurant').get('latitude'),
+                    'longitude': data.get('restaurant').get('longitude'),
+                },
                 'latitude': latitude,
                 'longitude': longitude
             }
-            commit_crawler_task.put(source='ele', cookies=cookies, args=args)
+            commit_crawler_task.put(source=source, cookies=cookies, args=args)
     except Exception as e:
         return jsonify(success=False, message=e.message.__str__()), 500
     return jsonify(success=True), 200

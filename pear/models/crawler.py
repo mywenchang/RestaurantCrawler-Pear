@@ -31,15 +31,13 @@ class CrawlerDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def update_by_id(cls, crawler_id, u_id, status=None, data_count=None, total=None, finished=None, info=None,
+    def update_by_id(cls, crawler_id, u_id, status=None, data_count=None, finished=None, info=None,
                      extras=None):
         sql = update(crawler).where(and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
         if status:
             sql = sql.values(status=status)
         if data_count:
             sql = sql.values(data_count=data_count)
-        if total:
-            sql = sql.values(total=total)
         if finished:
             sql = sql.values(finished=finished)
         if info:
@@ -57,7 +55,7 @@ class CrawlerDao(BaseDao):
 
     @classmethod
     def batch_get_by_status(cls, u_id, page=1, per_page=20, status=None):
-        sql = select([crawler]).where(crawler.c.u_id == u_id).order_by(crawler.c.id.asc())
+        sql = select([crawler]).where(crawler.c.u_id == u_id).order_by(crawler.c.id.desc())
         count_sql = select([func.count(crawler.c.id)]).where(crawler.c.u_id == u_id)
         if status is not None:
             sql = sql.where(crawler.c.status == status)
@@ -88,14 +86,13 @@ class CrawlerDao(BaseDao):
         return {
             'id': item.id,
             'status': item.status if item.data_count > 0 else 2,
-            'created': item.created.strftime('%Y-%d-%m %H:%M:%S'),
-            'finished': item.finished.strftime('%Y-%d-%m %H:%M:%S') if item.finished else '',
+            'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
+            'finished': item.finished.strftime('%Y-%m-%d %H:%M:%S') if item.finished else '',
             'args': args,
             'restaurant': restaurant,
             'dishes': dishes,
             'info': item.info,
             'extras': item.extras,
-            'total': item.total,
             'count': item.data_count,
             'type': item.type,
             'source': item.source

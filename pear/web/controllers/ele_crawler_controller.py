@@ -7,6 +7,8 @@ from pear.jobs.job_queue import JobQueue
 from pear.models.restaurant import EleRestaurantDao
 from pear.utils.const import SOURCE
 from pear.utils.logger import logger
+from pear.utils.mem_cache import mem_cache
+from geohash2 import geohash
 
 queue = JobQueue()
 
@@ -77,22 +79,29 @@ def login_ele_by_mobile(mobile_phone, sms_code, sms_token):
         logger.error(e, exc_info=True)
 
 
+@mem_cache()
 def get_ele_city_list():
     url = 'https://www.ele.me/restapi/shopping/v1/cities'
     try:
         resp = requests.get(url, timeout=5)
         if resp.status_code == 200:
             data = resp.json()
-            return data
+            cities = []
+            for k, v in data.iteritems():
+                cities.extend(data[k])
+            return cities
     except Exception as e:
         logger.error(e, exc_info=True)
 
 
-def search_ele_address(key):
+@mem_cache()
+def search_ele_address(key, latitude, longitude):
     url = 'https://www.ele.me/restapi/v2/pois'
+    _geohash = geohash.encode(latitude=float(latitude), longitude=float(longitude))
+    logger.info('geohash: {}'.format(_geohash))
     params = {
         'extras[]': 'count',
-        'geohash': 'wm6jbj1skd7d',
+        'geohash': _geohash,
         'keyword': key,
         'limit': 20,
         'type': 'nearby'
@@ -118,6 +127,7 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
     }
     try:
         resp = requests.get(url, timeout=5, params=params, cookies=cookies)
+        logger.info(resp.headers)
         if resp.status_code == 200:
             data = resp.json()
             for item in data:

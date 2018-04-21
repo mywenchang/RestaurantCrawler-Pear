@@ -61,25 +61,24 @@ CREATE TABLE `user` (
 	KEY `idx_mobile_passwd` (`mobile`, `passwd`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-DROP TABLE IF EXISTS `ele_rate`;
 CREATE TABLE `ele_rate` (
-    `id` INT(11) UNSIGNED AUTO_INCREMENT,
-    `rating_id` INT(10),
-    `rating_start` INT(1),
-    `rated_at` VARCHAR(50),
-    `rating_text` TEXT,
-    `time_spent_desc` VARCHAR(50),
-    `restaurant_id` INT(11) UNSIGNED,
-    `restaurant_crawler_id` INT(11) UNSIGNED,
-    `food_id` INT(11) UNSIGNED COMMENT '菜品id 对应 dish 表中 food_id',
-    `food_name` TEXT,
-    `food_star` INT(4),
-    `food_rate` TEXT,
-    PRIMARY KEY (`id`),
-    KEY `idx_restaurant_crawler_food_id` (`restaurant_id`, `restaurant_crawler_id`, `food_id`),
-    KEY `idx_restaurant_id_rating_start` (`restaurant_id`, `rating_start`),
-    KEY `idx_food` (`food_id`)
-) ENGINE = InnoDB CHARSET = utf8;
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `rating_id` int(10) DEFAULT NULL,
+  `rating_start` int(1) DEFAULT NULL,
+  `rated_at` varchar(50) DEFAULT NULL,
+  `rating_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `time_spent_desc` varchar(50) DEFAULT NULL,
+  `restaurant_id` int(11) unsigned DEFAULT NULL,
+  `restaurant_crawler_id` int(11) unsigned DEFAULT NULL,
+  `food_id` int(11) unsigned DEFAULT NULL COMMENT '菜品id 对应 dish 表中 food_id',
+  `food_name` text,
+  `food_star` int(4) DEFAULT NULL,
+  `food_rate` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`),
+  KEY `idx_restaurant_crawler_food_id` (`restaurant_id`,`restaurant_crawler_id`,`food_id`),
+  KEY `idx_restaurant_id_rating_start` (`restaurant_id`,`rating_start`),
+  KEY `idx_food` (`food_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2263 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `user_log`;
 CREATE TABLE `user_log` (

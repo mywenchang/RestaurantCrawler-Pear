@@ -63,20 +63,21 @@ def login_ele():
 # --------------------------------------------
 
 @config_ele_crawler_router.route('/cities')
-@authorize
 def fetch_ele_cites():
-    city_dict = get_ele_city_list()
-    if city_dict:
-        return jsonify(city_dict)
+    cities = get_ele_city_list()
+    if cities:
+        return jsonify(cities)
     else:
-        return []
+        return jsonify([])
 
 
 @config_ele_crawler_router.route('/search_address')
 @authorize
 def ele_address():
     keyword = request.args.get('key')
-    data = search_ele_address(keyword)
+    lat = request.args.get('lat', 0)
+    lng = request.args.get('lng', 0)
+    data = search_ele_address(keyword, lat, lng)
     if data:
         return jsonify(data)
     else:
@@ -87,9 +88,9 @@ def ele_address():
 @authorize
 def ele_restaurants():
     cookies = request.cookies
-    address = request.json
-    offset = 0
-    limit = 24
-    data = get_ele_restaurants(address.get('geohash'), address.get('latitude'), address.get('longitude'), offset=offset,
+    payload = request.json
+    offset = payload.get('offset', 0)
+    limit = payload.get('limit', 24)
+    data = get_ele_restaurants(payload.get('geohash'), payload.get('latitude'), payload.get('longitude'), offset=offset,
                                limit=limit, cookies=cookies)
     return jsonify(data)

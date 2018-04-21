@@ -6,7 +6,7 @@ config = {
         'host': '0.0.0.0',
         'port': 11300
     },
-    'logging_formatter': '%(asctime)s %(name)s [%(process)d] %(module)s %(filename)s %(lineno)d %(levelname)s %(message)s'
+    'logging_formatter': '%(asctime)s [%(process)d] %(filename)s %(lineno)d %(levelname)s: %(message)s'
 }
 
 MYSQL_CONFIG = config['mysql']

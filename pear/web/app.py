@@ -19,6 +19,7 @@ def install_modules(app):
     app.register_blueprint(authorize_router)
     app.register_blueprint(crawler_tasks_router)
     app.register_blueprint(data_router)
+    logger.info(app.url_map)
 
 
 def get_application():
@@ -32,9 +33,7 @@ def get_application():
 
     @app.before_request
     def before_request():
-        origin = request.headers.get('origin')
-        address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-        logger.info(u'origin: {}, address:{}, method:{}'.format(origin, address, request.method))
+        pass
 
     @app.after_request
     def after_request(response):

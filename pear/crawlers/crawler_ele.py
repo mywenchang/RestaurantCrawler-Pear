@@ -68,7 +68,7 @@ class CrawlEleDishes(BaseCrawler):
                 total += 1
                 self.update_count(total)
 
-        self.done(total)
+        self.done()
         dish_crawler = CrawlerEleShopRate(3, self.cookies, self.id, self.args)
         dish_crawler.crawl()
 
@@ -132,7 +132,7 @@ class CrawlerEleShopRate(BaseCrawler):
                                   food_id, food_name, food_star, food_rate, self.restaurant_id)
         data_size = len(data)
         if data_size < 1:
-            self.done(self.page_offset)
+            self.done()
             return
         self.page_offset += data_size
         self.querystring['offset'] = self.page_offset

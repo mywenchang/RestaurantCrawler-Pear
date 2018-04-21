@@ -20,7 +20,8 @@ setup(
         'mock',
         'pytest',
         'coloredlogs',
-        'selenium'
+        'selenium',
+        'geohash2'
     ],
     entry_points={
         'console_scripts': [

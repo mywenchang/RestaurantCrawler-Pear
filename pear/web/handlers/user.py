@@ -23,7 +23,7 @@ def get_user_info():
 @authorize
 def get_user_activity():
     u_id = request.cookies.get('u_id')
-    crawlers, crawler_total = CrawlerDao.batch_get_by_status(u_id, page=-1)
+    crawlers, crawler_total = CrawlerDao.batch_get_by_status(u_id, page=1, per_page=5)
     logs, logs_total = UserLogDao.get_by_user(u_id)
     return jsonify(
         crawlers={
