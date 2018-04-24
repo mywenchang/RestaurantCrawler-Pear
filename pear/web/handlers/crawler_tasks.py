@@ -85,4 +85,6 @@ def update_crawler(crawler_id):
 @crawler_tasks_router.route('/<int:crawler_id>', methods=['DELETE'])
 @authorize
 def delete_crawler(crawler_id):
+    u_id = request.cookies.get('u_id')
+    CrawlerDao.delete(crawler_id, u_id)
     return jsonify(status="ok")
