@@ -1,4 +1,5 @@
 # coding=utf-8
+from datetime import datetime
 
 from sqlalchemy.sql import select, func
 
@@ -10,7 +11,7 @@ class UserLogDao(BaseDao):
 
     @classmethod
     def get_by_user(cls, u_id, page=-1, per_page=20):
-        sql = select([user_log]).where(user_log.c.user_id == u_id)
+        sql = select([user_log]).where(user_log.c.user_id == u_id).order_by(user_log.c.id.desc())
         count_sql = select([func.count(user_log.c.id)]).where(user_log.c.user_id == u_id)
         return cls.get_list(sql, page=page, per_page=per_page, count_sql=count_sql)
 
@@ -28,5 +29,7 @@ class UserLogDao(BaseDao):
             'id': item.id,
             'user_id': item.user_id,
             'action_name': item.action_name,
-            'action_args': item.action_args
+            'action_args': item.action_args,
+            'key': item.id,
+            'created': item.created.strftime('%Y-%m-%d %H:%M:%S')
         }

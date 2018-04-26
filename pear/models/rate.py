@@ -64,5 +64,6 @@ class EleRateDao(BaseDao):
             'food_id': item.food_id,
             'food_name': item.food_name,
             'food_star': item.food_star,
-            'food_rate': item.food_rate
+            'food_rate': item.food_rate,
+            'key': item.id
         }

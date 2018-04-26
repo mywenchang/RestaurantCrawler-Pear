@@ -42,5 +42,6 @@ class EleDishDao(BaseDao):
             "moth_sales": item.moth_sales,
             "rating_count": item.rating_count,
             "price": item.price,
-            "crawler_id": item.crawler_id
+            "crawler_id": item.crawler_id,
+            'key': item.food_id
         }

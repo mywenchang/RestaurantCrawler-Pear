@@ -21,7 +21,12 @@ setup(
         'pytest',
         'coloredlogs',
         'selenium',
-        'geohash2'
+        'geohash2',
+        'jieba',
+        'wordcloud',
+        'Pillow',
+        'numpy',
+        'matplotlib'
     ],
     entry_points={
         'console_scripts': [

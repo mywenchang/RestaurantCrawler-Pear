@@ -95,5 +95,6 @@ class CrawlerDao(BaseDao):
             'extras': item.extras,
             'count': item.data_count,
             'type': item.type,
-            'source': item.source
+            'source': item.source,
+            'key': item.id
         }

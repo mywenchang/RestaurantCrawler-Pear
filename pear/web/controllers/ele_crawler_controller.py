@@ -131,6 +131,7 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
         if resp.status_code == 200:
             data = resp.json()
             for item in data:
+                image_path = item['image_path']
                 save_ele_restaurants.put(
                     source=SOURCE.ELE,
                     restaurant_id=item['id'],
@@ -140,7 +141,10 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
                     send_fee=item['float_delivery_fee'],
                     score=item['rating'],
                     latitude=item['latitude'],
-                    longitude=item['longitude']
+                    longitude=item['longitude'],
+                    image='https://fuss10.elemecdn.com/{}/{}/{}.{}'.format(image_path[0:1], image_path[1:3],
+                                                                           image_path[3:],
+                                                                           image_path[32:])
                 )
             return data
     except Exception as e:
@@ -164,11 +168,12 @@ def commit_crawler_task(source, cookies, args):
 
 
 @queue.task('crawlers')
-def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
+def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
     restaurant = EleRestaurantDao.get_by_restaurant_id(restaurant_id)
     if restaurant:
         EleRestaurantDao.update_by_restaurant_id(restaurant_id, name=name, source=source, sales=sales,
                                                  arrive_time=arrive_time, send_fee=send_fee, score=score,
-                                                 latitude=latitude, longitude=longitude)
+                                                 latitude=latitude, longitude=longitude, image=image)
     else:
-        EleRestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude)
+        EleRestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude,
+                                image)

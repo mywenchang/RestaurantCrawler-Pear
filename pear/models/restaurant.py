@@ -8,7 +8,7 @@ from pear.models.tables import ele_restaurant
 class EleRestaurantDao(BaseDao):
 
     @classmethod
-    def create(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude):
+    def create(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
         sql = ele_restaurant.insert().values(
             restaurant_id=restaurant_id,
             name=name,
@@ -18,7 +18,8 @@ class EleRestaurantDao(BaseDao):
             send_fee=send_fee,
             score=score,
             latitude=latitude,
-            longitude=longitude
+            longitude=longitude,
+            image=image
         )
         return cls.insert(sql)
 
@@ -31,7 +32,7 @@ class EleRestaurantDao(BaseDao):
 
     @classmethod
     def update_by_restaurant_id(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude,
-                                longitude):
+                                longitude, image):
         sql = ele_restaurant.update().where(ele_restaurant.c.restaurant_id == restaurant_id).values(
             name=name,
             source=source,
@@ -40,7 +41,8 @@ class EleRestaurantDao(BaseDao):
             send_fee=send_fee,
             score=score,
             latitude=latitude,
-            longitude=longitude
+            longitude=longitude,
+            image=image
         )
         return cls.update(sql)
 
@@ -62,5 +64,8 @@ class EleRestaurantDao(BaseDao):
             "arrive_time": item.arrive_time,
             "score": item.score,
             "latitude": item.latitude,
-            "longitude": item.longitude
+            "longitude": item.longitude,
+            "image": item.image,
+            'key': item.id,
+            'send_fee': item.send_fee
         }

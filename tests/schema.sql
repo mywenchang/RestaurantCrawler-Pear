@@ -10,6 +10,7 @@ CREATE TABLE `ele_restaurant` (
 	`score` FLOAT UNSIGNED DEFAULT 0 COMMENT '评分',
 	`latitude` VARCHAR(20),
 	`longitude` VARCHAR(20),
+	image TEXT,
 	PRIMARY KEY (`id`),
 	KEY `idx_restaurant_id` (`restaurant_id`)
 ) ENGINE = InnoDB CHARSET = utf8;
@@ -61,6 +62,7 @@ CREATE TABLE `user` (
 	KEY `idx_mobile_passwd` (`mobile`, `passwd`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
+DROP TABLE IF EXISTS `ele_rate`;
 CREATE TABLE `ele_rate` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `rating_id` int(10) DEFAULT NULL,

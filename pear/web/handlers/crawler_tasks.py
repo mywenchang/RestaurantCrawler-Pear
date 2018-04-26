@@ -7,6 +7,7 @@ from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
 from pear.models.restaurant import EleRestaurantDao
 from pear.utils.authorize import authorize
+from pear.utils.logger import logger
 from pear.web.controllers.ele_crawler_controller import commit_crawler_task
 
 crawler_tasks_router = Blueprint('tasks_router', __name__, url_prefix='/crawler_tasks')
@@ -47,6 +48,15 @@ def get_crawler(crawler_id=None):
     )
 
 
+@crawler_tasks_router.route('/status/<int:crawler_id>')
+@authorize
+def get_crawler_status(crawler_id):
+    u_id = request.cookies.get('u_id')
+    crawler = CrawlerDao.get_by_id(crawler_id, u_id)
+    logger.info(crawler['count'])
+    return jsonify(crawler)
+
+
 @crawler_tasks_router.route('', methods=['POST'])
 @authorize
 def create_crawler():
@@ -74,12 +84,6 @@ def create_crawler():
     except Exception as e:
         return jsonify(success=False, message=e.message.__str__()), 500
     return jsonify(success=True), 200
-
-
-@crawler_tasks_router.route('/<int:crawler_id>', methods=['PUT'])
-@authorize
-def update_crawler(crawler_id):
-    return jsonify(status="ok")
 
 
 @crawler_tasks_router.route('/<int:crawler_id>', methods=['DELETE'])

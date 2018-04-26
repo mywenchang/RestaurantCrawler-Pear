@@ -6,6 +6,7 @@ from pear.models.crawler import CrawlerDao
 from pear.models.user import UserDao
 from pear.utils.authorize import authorize
 from pear.models.user_log import UserLogDao
+from pear.utils.const import Crawler_Status
 
 user_router = Blueprint('user', __name__, url_prefix='/user')
 
@@ -23,12 +24,14 @@ def get_user_info():
 @authorize
 def get_user_activity():
     u_id = request.cookies.get('u_id')
-    crawlers, crawler_total = CrawlerDao.batch_get_by_status(u_id, page=1, per_page=5)
+    crawlers, crawler_total = CrawlerDao.batch_get_by_status(u_id, page=-1)
+    _, done_total = CrawlerDao.batch_get_by_status(u_id, page=-1, status=Crawler_Status.DONE)
     logs, logs_total = UserLogDao.get_by_user(u_id)
     return jsonify(
         crawlers={
             'data': crawlers,
-            'crawler_total': crawler_total
+            'crawler_total': crawler_total,
+            'done_total': done_total
         },
         actions={
             'data': logs,
