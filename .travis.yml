@@ -1,8 +1,14 @@
 language: python
 sudo: required
+service:
+  - mysql
 before_install: 
   - sudo apt-get install python-dev
-  - sudo pip install zc.buildout    
+  - sudo pip install zc.buildout
+  - mysql -e 'CREATE DATABASE db_pear;'
+  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+  - sudo mysql_upgrade
+  - sudo service mysql restart  
 install:
   - buildout
 script:

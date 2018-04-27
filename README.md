@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jiyangg/Pear.svg?branch=master)](https://travis-ci.org/jiyangg/Pear)
+
 # 项目结构
 |模块名|文件目录|说明|
 |:---:|:---:|:---:|
