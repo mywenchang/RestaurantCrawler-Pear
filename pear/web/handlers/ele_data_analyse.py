@@ -21,6 +21,8 @@ def compare_all():
     data = {}
     for item in crawlers:
         restaurant = item['restaurant']
+        if not restaurant:
+            continue
         data.setdefault(restaurant['name'], {})
         data[restaurant['name']] = {
             'sales': restaurant['sales'],

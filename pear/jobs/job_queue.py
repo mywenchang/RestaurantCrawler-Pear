@@ -13,10 +13,11 @@ from pear.utils.logger import logger
 
 
 class Subscriber(object):
-    FUN_MAP = defaultdict(dict)
+    FUN_MAP = {}
 
     def __init__(self, func, tube):
         logger.info('register func:{} to tube:{}.'.format(func.__name__, tube))
+        Subscriber.FUN_MAP.setdefault(tube, {})
         Subscriber.FUN_MAP[tube][func.__name__] = func
 
 

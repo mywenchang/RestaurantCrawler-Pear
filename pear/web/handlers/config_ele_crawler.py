@@ -55,7 +55,7 @@ def login_ele():
         resp = Response(data, mimetype='application/json')
         for i, v in cookies.iteritems():
             resp.set_cookie(i, v)
-        resp.set_cookie('ele_has_login', '1')
+        resp.set_cookie('ele_login_account', str(mobile))
         return resp
     return jsonify(success=False, message=content)
 
