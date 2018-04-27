@@ -1,0 +1,8 @@
+language: python
+sudo: required
+before_install: 
+  - sudo apt-get install python-dev
+  - sudo pip install zc.buildout  
+  - sudo apt-get install
+install:
+  - buildout
