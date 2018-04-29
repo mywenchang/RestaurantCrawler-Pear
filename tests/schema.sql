@@ -15,8 +15,8 @@ CREATE TABLE `restaurant` (
 	KEY `idx_restaurant_id` (`restaurant_id`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-DROP TABLE IF EXISTS `ele_dish`;
-CREATE TABLE `ele_dish` (
+DROP TABLE IF EXISTS `dish`;
+CREATE TABLE `dish` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
 	`food_id` INT(11) UNSIGNED COMMENT '菜品id',
 	`restaurant_id` INT(11) UNSIGNED COMMENT 'restaurant 表中的 id',
@@ -62,8 +62,8 @@ CREATE TABLE `user` (
 	KEY `idx_mobile_passwd` (`mobile`, `passwd`)
 ) ENGINE = InnoDB CHARSET = utf8;
 
-DROP TABLE IF EXISTS `ele_rate`;
-CREATE TABLE `ele_rate` (
+DROP TABLE IF EXISTS `rate`;
+CREATE TABLE `rate` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `rating_id` int(10) DEFAULT NULL,
   `rating_start` int(1) DEFAULT NULL,

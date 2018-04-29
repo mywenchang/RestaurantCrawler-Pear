@@ -6,9 +6,8 @@ import requests
 import time
 
 from pear.crawlers.base import BaseCrawler
-from pear.models.dish import EleDishDao
-from pear.models.rate import EleRateDao
-from pear.models.user_log import UserLogDao
+from pear.models.dish import DishDao
+from pear.models.rate import RateDao
 from pear.utils.const import SOURCE
 
 logger = logging.getLogger('')
@@ -67,8 +66,7 @@ class CrawlEleDishes(BaseCrawler):
                 "record_type": 1
             }
             logger.info('start_crawl_ele_rate_{}'.format(self.restaurant_id))
-            response = requests.request(
-                "GET", url, headers=headers, params=querystring, cookies=self.cookies)
+            response = requests.request("GET", url, headers=headers, params=querystring, cookies=self.cookies)
             if response.status_code != requests.codes.ok:
                 self.error(json.dumps(response.json()))
                 return
@@ -85,8 +83,8 @@ class CrawlEleDishes(BaseCrawler):
                     food_name = food.get('rate_name')
                     food_star = food.get('rating_star')
                     food_rate = food.get('rating_text')
-                    EleRateDao.create(self.id, rating_id, rating_star, rated_at, rating_text, time_spent_desc,
-                                      food_id, food_name, food_star, food_rate, self.restaurant_id)
+                    RateDao.create(self.id, rating_id, rating_star, rated_at, rating_text, time_spent_desc,
+                                   food_id, food_name, food_star, food_rate, self.restaurant_id)
             data_size = len(data)
             if data_size < 1:
                 return
@@ -112,8 +110,8 @@ class CrawlEleDishes(BaseCrawler):
                 rating_count = food_item.get('rating_count')
                 food_id = food_item.get('specfoods')[0].get('food_id')
                 price = food_item.get('specfoods')[0].get('price')
-                EleDishDao.create(food_id, restaurant_id, name,
-                                  rating, month_sales, rating_count, price, self.id)
+                DishDao.create(food_id, restaurant_id, name,
+                               rating, month_sales, rating_count, price, self.id)
                 total += 1
                 self.update_count(total)
         try:
@@ -121,70 +119,3 @@ class CrawlEleDishes(BaseCrawler):
         except Exception as e:
             logger.error(e, exc_info=True)
         self.done()
-
-
-# 爬取评论
-class CrawlerEleShopRate(BaseCrawler):
-    def __init__(self, c_type, cookies, restaurant_crawler_id, args=None):
-        self.page_size = 10
-        self.page_offset = 0
-        self.restaurant_crawler_id = restaurant_crawler_id
-        restaurant = args.get('restaurant')
-        self.restaurant_id = restaurant.get('id')
-        super(CrawlerEleShopRate, self).__init__(SOURCE.ELE, c_type, self.restaurant_id, cookies, args)
-        self.latitude = args.get('latitude')
-        self.longitude = args.get('longitude')
-        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(
-            self.restaurant_id)
-        self.headers = {
-            'accept': "application/json, text/plain, */*",
-            'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),
-                                                    restaurant.get('longitude')),
-            'user-agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.91 Safari/537.36",
-            'referer': "https://www.ele.me/shop/{}".format(self.restaurant_id),
-            'accept-encoding': "gzip, deflate, br",
-            'accept-language': "zh-CN,zh;q=0.8,en;q=0.6,zh-TW;q=0.4",
-            'cache-control': "no-cache",
-        }
-        self.querystring = {
-            "limit": self.page_size,
-            "offset": self.page_offset,
-            "record_type": 1
-        }
-        extras = {
-            'headers': self.headers,
-            'query': self.querystring
-        }
-        self.insert_extras(json.dumps(extras))
-
-    def crawl(self):
-        logger.info('start_crawl_ele_rate_{}'.format(self.restaurant_id))
-        response = requests.request("GET", self.url, headers=self.headers, params=self.querystring,
-                                    cookies=self.cookies)
-        if response.status_code != requests.codes.ok:
-            self.error(json.dumps(response.json()))
-            return
-        data = response.json()
-        for item in data:
-            rating_id = int(time.time())
-            rating_star = item.get('rating_star')
-            rated_at = item.get('rated_at')
-            rating_text = item.get('rating_text')
-            time_spent_desc = item.get('time_spent_desc')
-            food_list = item.get('item_rating_list')
-            for food in food_list:
-                food_id = food.get('food_id')
-                food_name = food.get('rate_name')
-                food_star = food.get('rating_star')
-                food_rate = food.get('rating_text')
-                EleRateDao.create(self.restaurant_crawler_id, rating_id, rating_star, rated_at, rating_text,
-                                  time_spent_desc,
-                                  food_id, food_name, food_star, food_rate, self.restaurant_id)
-        data_size = len(data)
-        if data_size < 1:
-            self.done()
-            return
-        self.page_offset += data_size
-        self.querystring['offset'] = self.page_offset
-        self.update_count(self.page_offset)
-        self.crawl()

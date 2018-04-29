@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import update, select, and_, func
 
 from pear.models.base import BaseDao
-from pear.models.dish import EleDishDao
+from pear.models.dish import DishDao
 from pear.models.restaurant import RestaurantDao
 from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
@@ -79,7 +79,7 @@ class CrawlerDao(BaseDao):
         if not item:
             return None
         restaurant = RestaurantDao.get_by_restaurant_id(item.restaurant_id)
-        dishes, _ = EleDishDao.get_by_crawler_id(item.id)
+        dishes, _ = DishDao.get_by_crawler_id(item.id)
         return {
             'id': item.id,
             'status': item.status if item.data_count > 0 else 2,

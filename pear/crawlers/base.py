@@ -22,12 +22,10 @@ class BaseCrawler(object):
         raise NotImplemented
 
     def done(self):
-        CrawlerDao.update_by_id(
-            self.id, self.u_id, status=Crawler_Status.DONE, finished=datetime.now())
+        CrawlerDao.update_by_id(self.id, self.u_id, status=Crawler_Status.DONE, finished=datetime.now())
 
     def error(self, info):
-        CrawlerDao.update_by_id(
-            self.id, self.u_id, status=Crawler_Status.Error, info=info, finished=datetime.now())
+        CrawlerDao.update_by_id(self.id, self.u_id, status=Crawler_Status.Error, info=info, finished=datetime.now())
         logger.error(info)
 
     def insert_extras(self, extras):

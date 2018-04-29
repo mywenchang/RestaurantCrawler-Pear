@@ -2,8 +2,8 @@
 from flask import Blueprint, jsonify, url_for, request
 
 from pear.models.crawler import CrawlerDao
-from pear.models.dish import EleDishDao
-from pear.models.rate import EleRateDao
+from pear.models.dish import DishDao
+from pear.models.rate import RateDao
 from pear.models.restaurant import RestaurantDao
 from pear.utils.split_words import generator_cloud
 
@@ -20,7 +20,7 @@ def get_restaurant(source, restaurant_id):
 # 分布
 @data_router.route('/dish_distribution/<int:crawler_id>')
 def sale_distribution(crawler_id):
-    dish, _ = EleDishDao.get_by_crawler_id(crawler_id, page=-1)
+    dish, _ = DishDao.get_by_crawler_id(crawler_id, page=-1)
 
     def render_item(k):
         return sorted([
@@ -47,7 +47,7 @@ def sale_distribution(crawler_id):
     price_dis = sorted([{'name': k, 'value': v} for k, v in price_dis.items()], key=lambda d: d['name'])
 
     # 店铺评论数随时间分布
-    rate, _ = EleRateDao.get_by_crawler_id(crawler_id, page=-1)
+    rate, _ = RateDao.get_by_crawler_id(crawler_id, page=-1)
     rate_date_dis = {}
     for item in rate:
         rate_at = item['rated_at']
@@ -65,7 +65,7 @@ def sale_distribution(crawler_id):
 # 词云
 @data_router.route('/rating_word_cloud/<int:crawler_id>')
 def rating_cloud(crawler_id):
-    rate, _ = EleRateDao.get_by_crawler_id(crawler_id, page=-1)
+    rate, _ = RateDao.get_by_crawler_id(crawler_id, page=-1)
     food_rates = {}
     restaurant_id = 0
     for item in rate:
