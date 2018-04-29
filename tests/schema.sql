@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `ele_restaurant`;
-CREATE TABLE `ele_restaurant` (
+DROP TABLE IF EXISTS `restaurant`;
+CREATE TABLE `restaurant` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
 	`restaurant_id` INT(11) UNSIGNED COMMENT '商家id，来自数据源',
 	`name` VARCHAR(100) DEFAULT NULL COMMENT '商家名称',
@@ -34,6 +34,7 @@ DROP TABLE IF EXISTS `crawler`;
 CREATE TABLE `crawler` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
 	`u_id` INT(11) UNSIGNED NOT NULL COMMENT '提交任务的用户id',
+	`restaurant_id` INT(11) UNSIGNED NOT NULL COMMENT '商家id',
 	`status` TINYINT(1) DEFAULT 0 COMMENT '任务执行的状态',
 	`created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	`finished` TIMESTAMP NULL DEFAULT NULL,
@@ -41,7 +42,6 @@ CREATE TABLE `crawler` (
 	`info` TEXT,
 	`extras` TEXT,
 	`data_count` INT(11) UNSIGNED DEFAULT 0 COMMENT '当前获取到的数据量',
-	`total` INT(11) UNSIGNED DEFAULT 0 COMMENT '总数据量',
 	`type` INT(1) UNSIGNED COMMENT '爬虫类型',
 	`source` INT(1) COMMENT '数据来源',
 	PRIMARY KEY (`id`)

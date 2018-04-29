@@ -10,4 +10,4 @@ develop-eggs/
 .coverage
 nosetests.xml
 .vscode
-pear/web/static/word_cloud_images/*.png
+*.png

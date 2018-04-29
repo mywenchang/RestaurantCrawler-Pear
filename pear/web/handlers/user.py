@@ -3,6 +3,7 @@
 from flask import Blueprint, request, jsonify
 
 from pear.models.crawler import CrawlerDao
+from pear.models.restaurant import RestaurantDao
 from pear.models.user import UserDao
 from pear.utils.authorize import authorize
 from pear.models.user_log import UserLogDao

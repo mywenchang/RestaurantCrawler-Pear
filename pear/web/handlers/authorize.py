@@ -40,7 +40,6 @@ def signup():
     mobile = data.get('mobile')
     password = data.get('password')
     sms_code = data.get('smsCode')
-    # TODO 验证短信验证码
     if UserDao.is_exist(email=email, name=name, mobile=mobile):
         return jsonify(status='false', message=u'用户已经存在'), 409
     if not password or not mobile:

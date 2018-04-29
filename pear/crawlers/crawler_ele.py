@@ -17,8 +17,6 @@ logger = logging.getLogger('')
 # 爬取菜品
 class CrawlEleDishes(BaseCrawler):
     def __init__(self, c_type, cookies, args=None):
-        super(CrawlEleDishes, self).__init__(SOURCE.ELE, c_type, cookies, args)
-        UserLogDao.create(self.u_id, u'创建饿了么爬虫')
         self.url = 'https://www.ele.me/restapi/shopping/v2/menu'
         self.args = args
         if not args:
@@ -28,6 +26,7 @@ class CrawlEleDishes(BaseCrawler):
         self.latitude = args.get('latitude')
         self.longitude = args.get('longitude')
         self.cookies = cookies
+        super(CrawlEleDishes, self).__init__(SOURCE.ELE, c_type, self.restaurant_id, cookies, args)
         self.querystring = {"restaurant_id": self.restaurant_id}
         self.headers = {
             'accept': "application/json, text/plain, */*",
@@ -47,7 +46,8 @@ class CrawlEleDishes(BaseCrawler):
         self.insert_extras(json.dumps(extras))
 
     def __crawl_rate(self, total):
-        url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
+        url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(
+            self.restaurant_id)
         headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, self.restaurant.get('latitude'),
@@ -67,7 +67,8 @@ class CrawlEleDishes(BaseCrawler):
                 "record_type": 1
             }
             logger.info('start_crawl_ele_rate_{}'.format(self.restaurant_id))
-            response = requests.request("GET", url, headers=headers, params=querystring, cookies=self.cookies)
+            response = requests.request(
+                "GET", url, headers=headers, params=querystring, cookies=self.cookies)
             if response.status_code != requests.codes.ok:
                 self.error(json.dumps(response.json()))
                 return
@@ -94,7 +95,8 @@ class CrawlEleDishes(BaseCrawler):
 
     def crawl(self):
         logger.info('start_craw_ele_dishes_{}'.format(self.restaurant_id))
-        response = requests.get(self.url, headers=self.headers, params=self.querystring, cookies=self.cookies)
+        response = requests.get(
+            self.url, headers=self.headers, params=self.querystring, cookies=self.cookies)
         if response.status_code != requests.codes.ok:
             self.error(json.dumps(response.json()))
             return
@@ -110,7 +112,8 @@ class CrawlEleDishes(BaseCrawler):
                 rating_count = food_item.get('rating_count')
                 food_id = food_item.get('specfoods')[0].get('food_id')
                 price = food_item.get('specfoods')[0].get('price')
-                EleDishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, price, self.id)
+                EleDishDao.create(food_id, restaurant_id, name,
+                                  rating, month_sales, rating_count, price, self.id)
                 total += 1
                 self.update_count(total)
         try:
@@ -123,17 +126,16 @@ class CrawlEleDishes(BaseCrawler):
 # 爬取评论
 class CrawlerEleShopRate(BaseCrawler):
     def __init__(self, c_type, cookies, restaurant_crawler_id, args=None):
-        super(CrawlerEleShopRate, self).__init__(SOURCE.ELE, c_type, cookies, args)
-        UserLogDao.create(self.u_id, u'创建饿了么评论爬虫')
-
         self.page_size = 10
         self.page_offset = 0
         self.restaurant_crawler_id = restaurant_crawler_id
         restaurant = args.get('restaurant')
         self.restaurant_id = restaurant.get('id')
+        super(CrawlerEleShopRate, self).__init__(SOURCE.ELE, c_type, self.restaurant_id, cookies, args)
         self.latitude = args.get('latitude')
         self.longitude = args.get('longitude')
-        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(self.restaurant_id)
+        self.url = 'https://www.ele.me/restapi/ugc/v1/restaurant/{}/ratings'.format(
+            self.restaurant_id)
         self.headers = {
             'accept': "application/json, text/plain, */*",
             'x-shard': "shopid={};loc={},{}".format(self.restaurant_id, restaurant.get('latitude'),

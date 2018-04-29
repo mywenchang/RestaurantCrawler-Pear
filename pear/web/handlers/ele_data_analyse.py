@@ -4,44 +4,16 @@ from flask import Blueprint, jsonify, url_for, request
 from pear.models.crawler import CrawlerDao
 from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
-from pear.models.restaurant import EleRestaurantDao
+from pear.models.restaurant import RestaurantDao
 from pear.utils.split_words import generator_cloud
 
 data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
-
-__RestaurantDaoS = {
-    1: EleRestaurantDao
-}
-
-
-@data_router.route('/compare_all')
-def compare_all():
-    u_id = request.cookies.get('u_id')
-    crawlers, _ = CrawlerDao.batch_get_by_status(u_id, page=-1)
-    data = {}
-    for item in crawlers:
-        restaurant = item['restaurant']
-        if not restaurant:
-            continue
-        data.setdefault(restaurant['name'], {})
-        data[restaurant['name']] = {
-            'sales': restaurant['sales'],
-            'score': restaurant['score'],
-            'send_fee': restaurant['send_fee'],
-            'arrive_time': restaurant['arrive_time'],
-            'dish_total': len(item['dishes'])
-        }
-
-    return jsonify(data)
 
 
 # 获取店铺
 @data_router.route('/restaurant/<int:source>/<int:restaurant_id>')
 def get_restaurant(source, restaurant_id):
-    Dao = __RestaurantDaoS.get(source)
-    restaurant = None
-    if Dao:
-        restaurant = Dao.get_by_restaurant_id(restaurant_id)
+    restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id, source=source)
     return jsonify(restaurant)
 
 
@@ -113,10 +85,10 @@ def rating_cloud(crawler_id):
 @data_router.route('/compare/<int:crawler_one>/<int:crawler_two>')
 def compare(crawler_one, crawler_two):
     u_id = request.cookies.get('u_id')
-    dish_1, _ = EleDishDao.get_by_crawler_id(crawler_one, page=-1)
-    dish_2, _ = EleDishDao.get_by_crawler_id(crawler_two, page=-1)
     crawler_1 = CrawlerDao.get_by_id(crawler_one, u_id)
     crawler_2 = CrawlerDao.get_by_id(crawler_two, u_id)
+    dish_1 = crawler_1['dishes']
+    dish_2 = crawler_2['dishes']
     # 同价位商品销量比较
     sales_compare_with_same_price = {}
     # 同价位商品评价比较

@@ -2,14 +2,14 @@
 from sqlalchemy import select
 
 from pear.models.base import BaseDao
-from pear.models.tables import ele_restaurant
+from pear.models.tables import restaurant
 
 
-class EleRestaurantDao(BaseDao):
+class RestaurantDao(BaseDao):
 
     @classmethod
     def create(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
-        sql = ele_restaurant.insert().values(
+        sql = restaurant.insert().values(
             restaurant_id=restaurant_id,
             name=name,
             source=source,
@@ -25,15 +25,15 @@ class EleRestaurantDao(BaseDao):
 
     @classmethod
     def get_by_restaurant_id(cls, restaurant_id, source=None):
-        sql = select([ele_restaurant]).where(ele_restaurant.c.restaurant_id == restaurant_id)
+        sql = select([restaurant]).where(restaurant.c.restaurant_id == restaurant_id)
         if source is not None:
-            sql = sql.where(ele_restaurant.c.source == source)
+            sql = sql.where(restaurant.c.source == source)
         return cls.get_one(sql)
 
     @classmethod
     def update_by_restaurant_id(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude,
                                 longitude, image):
-        sql = ele_restaurant.update().where(ele_restaurant.c.restaurant_id == restaurant_id).values(
+        sql = restaurant.update().where(restaurant.c.restaurant_id == restaurant_id).values(
             name=name,
             source=source,
             sales=sales,
@@ -48,7 +48,7 @@ class EleRestaurantDao(BaseDao):
 
     @classmethod
     def batch(cls, page=1, per_page=20):
-        sql = select([ele_restaurant]).order_by(ele_restaurant.c.id.asc())
+        sql = select([restaurant]).order_by(restaurant.c.id.asc())
         return cls.get_list(sql, page, per_page)
 
     @classmethod

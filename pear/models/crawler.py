@@ -1,24 +1,24 @@
 # coding=utf-8
 
-import json
 from datetime import datetime
 from sqlalchemy import update, select, and_, func
 
 from pear.models.base import BaseDao
+from pear.models.dish import EleDishDao
+from pear.models.restaurant import RestaurantDao
 from pear.models.tables import crawler
 from pear.utils.const import Crawler_Status
-from pear.models.restaurant import EleRestaurantDao
-from pear.models.dish import EleDishDao
 
 
 class CrawlerDao(BaseDao):
 
     @classmethod
-    def create(cls, u_id, source, type, args=None, info=None, extras=None):
+    def create(cls, u_id, restaurant_id, source, type, args=None, info=None, extras=None):
         sql = crawler.insert().values(
             status=Crawler_Status.Crawling,
             created=datetime.now(),
             u_id=u_id,
+            restaurant_id=restaurant_id,
             type=type,
             source=source
         )
@@ -31,9 +31,9 @@ class CrawlerDao(BaseDao):
         return cls.insert(sql)
 
     @classmethod
-    def update_by_id(cls, crawler_id, u_id, status=None, data_count=None, finished=None, info=None,
-                     extras=None):
-        sql = update(crawler).where(and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
+    def update_by_id(cls, crawler_id, u_id, status=None, data_count=None, finished=None, info=None, extras=None):
+        sql = update(crawler).where(
+            and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
         if status:
             sql = sql.values(status=status)
         if data_count:
@@ -48,15 +48,18 @@ class CrawlerDao(BaseDao):
 
     @classmethod
     def get_by_id(cls, crawler_id, u_id, status=None):
-        sql = select([crawler]).where(and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
+        sql = select([crawler]).where(
+            and_(crawler.c.id == crawler_id, crawler.c.u_id == u_id))
         if status:
             sql = sql.where(crawler.c.status == status)
         return cls.get_one(sql)
 
     @classmethod
     def batch_get_by_status(cls, u_id, page=1, per_page=20, status=None):
-        sql = select([crawler]).where(crawler.c.u_id == u_id).order_by(crawler.c.id.desc())
-        count_sql = select([func.count(crawler.c.id)]).where(crawler.c.u_id == u_id)
+        sql = select([crawler]).where(crawler.c.u_id ==
+                                      u_id).order_by(crawler.c.id.desc())
+        count_sql = select([func.count(crawler.c.id)]
+                           ).where(crawler.c.u_id == u_id)
         if status is not None:
             sql = sql.where(crawler.c.status == status)
             count_sql = count_sql.where(crawler.c.status == status)
@@ -75,25 +78,19 @@ class CrawlerDao(BaseDao):
     def wrap_item(cls, item):
         if not item:
             return None
-        args = json.loads(item.args) if item.args else None
-        restaurant = []
-        dishes = []
-        if args:
-            restaurant = args.get('restaurant')
-            if restaurant:
-                restaurant = EleRestaurantDao.get_by_restaurant_id(restaurant.get('id'), source=item.source)
-        dishes, total = EleDishDao.get_by_crawler_id(item.id)
+        restaurant = RestaurantDao.get_by_restaurant_id(item.restaurant_id)
+        dishes, _ = EleDishDao.get_by_crawler_id(item.id)
         return {
             'id': item.id,
             'status': item.status if item.data_count > 0 else 2,
             'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
             'finished': item.finished.strftime('%Y-%m-%d %H:%M:%S') if item.finished else '',
-            'args': args,
-            'restaurant': restaurant,
-            'dishes': dishes,
+            'args': item.args,
             'info': item.info,
             'extras': item.extras,
             'count': item.data_count,
+            'restaurant': restaurant,
+            'dishes': dishes,
             'type': item.type,
             'source': item.source,
             'key': item.id

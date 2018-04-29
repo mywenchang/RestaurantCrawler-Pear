@@ -5,7 +5,7 @@ from flask import jsonify, Blueprint, request
 from pear.models.crawler import CrawlerDao
 from pear.models.dish import EleDishDao
 from pear.models.rate import EleRateDao
-from pear.models.restaurant import EleRestaurantDao
+from pear.models.restaurant import RestaurantDao
 from pear.utils.authorize import authorize
 from pear.utils.logger import logger
 from pear.web.controllers.ele_crawler_controller import commit_crawler_task
@@ -33,9 +33,6 @@ def get_crawler(crawler_id=None):
     crawler = CrawlerDao.get_by_id(crawler_id, u_id)
     if not crawler:
         return jsonify(crawler=None)
-    # 商家
-    restaurant_id = crawler.get('args').get('restaurant').get('id')
-    restaurant = EleRestaurantDao.get_by_restaurant_id(int(restaurant_id))
     # 菜品
     dishes, dish_total = EleDishDao.get_by_crawler_id(crawler_id, page=-1)
     # 评论
@@ -43,8 +40,7 @@ def get_crawler(crawler_id=None):
     return jsonify(
         crawler=crawler,
         dish={'total': dish_total, 'data': dishes},
-        rate={'total': rate_total, 'data': rate},
-        restaurant=restaurant
+        rate={'total': rate_total, 'data': rate}
     )
 
 
