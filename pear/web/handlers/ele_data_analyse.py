@@ -78,7 +78,7 @@ def rating_cloud(crawler_id):
     texts = ''.join([''.join(v) for v in food_rates.values()])
     total_image = generator_cloud(texts, '{}-{}'.format(crawler_id, restaurant_id))
     return jsonify({
-        'total_image': url_for('static', filename=total_image)
+        'total_image': 'http://{}{}'.format(request.host, url_for('static', filename=total_image))
     })
 
 

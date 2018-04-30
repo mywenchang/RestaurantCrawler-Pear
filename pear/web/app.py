@@ -44,6 +44,9 @@ def get_application():
         response.headers.add('Access-Control-Allow-Credentials', 'true')
         # 当 Access-Control-Allow-Credentials 为 true 时，需要指定允许的header key
         response.headers.add('Access-Control-Allow-Headers', 'content-type, accept, Access-Control-Allow-Origin')
+        #
+        response.headers.add('Access-Control-Allow-Methods', 'DELETE, PATCH, POST, PUT,GET')
+
         return response
 
     return app
