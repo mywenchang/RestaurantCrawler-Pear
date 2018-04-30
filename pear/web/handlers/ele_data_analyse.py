@@ -77,9 +77,7 @@ def rating_cloud(crawler_id):
         # 所有评论的词云
     texts = ''.join([''.join(v) for v in food_rates.values()])
     total_image = generator_cloud(texts, '{}-{}'.format(crawler_id, restaurant_id))
-    return jsonify({
-        'total_image': 'http://{}{}'.format(request.host, url_for('static', filename=total_image))
-    })
+    return jsonify({'total_image': url_for('static', filename=total_image, _external=True) if total_image else None})
 
 
 # 比较两家店
