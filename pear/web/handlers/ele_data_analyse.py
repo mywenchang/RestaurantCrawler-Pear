@@ -82,6 +82,7 @@ def rating_cloud(crawler_id):
     })
 
 
+# 比较两家店
 @data_router.route('/compare/<int:crawler_one>/<int:crawler_two>')
 def compare(crawler_one, crawler_two):
     u_id = request.cookies.get('u_id')
