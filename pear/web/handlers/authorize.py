@@ -5,7 +5,7 @@ import json
 from flask import Blueprint, request, jsonify, session, Response
 
 from pear.models.user import UserDao
-from pear.utils.logger import logger
+from pear.web.utils.set_cookie import set_cookie
 
 authorize_router = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -20,7 +20,7 @@ def login():
         return jsonify(status='false', message=u'密码错误'), 401
     session[user['id']] = user['name']
     resp = Response(json.dumps({'status': 'ok', 'user': user}), mimetype='application/json')
-    resp.set_cookie(key='u_id', value=str(user['id']))
+    set_cookie(resp, 'u_id', str(user['id']))
     return resp
 
 

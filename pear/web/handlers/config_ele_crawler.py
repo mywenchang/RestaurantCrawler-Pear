@@ -4,7 +4,8 @@ import json
 from flask import jsonify, Blueprint, request, Response
 
 from pear.models.user_log import UserLogDao
-from pear.utils.authorize import authorize
+from pear.web.utils.authorize import authorize
+from pear.web.utils.set_cookie import set_cookie
 from pear.web.controllers.ele_crawler_controller import get_ele_msg_code, login_ele_by_mobile, get_ele_captchas, \
     get_ele_city_list, search_ele_address, get_ele_restaurants
 
@@ -54,8 +55,8 @@ def login_ele():
     if success:
         resp = Response(data, mimetype='application/json')
         for i, v in cookies.iteritems():
-            resp.set_cookie(i, v)
-        resp.set_cookie('ele_login_account', str(mobile))
+            set_cookie(resp, i, v)
+        set_cookie(resp, 'ele_login_account', str(mobile))
         return resp
     return jsonify(success=False, message=content)
 

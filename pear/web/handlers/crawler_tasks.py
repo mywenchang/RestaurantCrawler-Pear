@@ -5,8 +5,7 @@ from flask import jsonify, Blueprint, request
 from pear.models.crawler import CrawlerDao
 from pear.models.dish import DishDao
 from pear.models.rate import RateDao
-from pear.models.restaurant import RestaurantDao
-from pear.utils.authorize import authorize
+from pear.web.utils.authorize import authorize
 from pear.utils.logger import logger
 from pear.web.controllers.ele_crawler_controller import commit_crawler_task
 
