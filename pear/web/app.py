@@ -33,7 +33,7 @@ def get_application():
 
     @app.before_request
     def before_request():
-        pass
+        logger.info(request.full_path)
 
     @app.after_request
     def after_request(response):
