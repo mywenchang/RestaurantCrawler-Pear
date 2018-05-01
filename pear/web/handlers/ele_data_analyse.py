@@ -86,6 +86,8 @@ def compare(crawler_one, crawler_two):
     u_id = request.cookies.get('u_id')
     crawler_1 = CrawlerDao.get_by_id(crawler_one, u_id)
     crawler_2 = CrawlerDao.get_by_id(crawler_two, u_id)
+    if not crawler_1 or not crawler_2:
+        return jsonify({'message': u'爬虫不存在'}), 401
     dish_1 = crawler_1['dishes']
     dish_2 = crawler_2['dishes']
     # 同价位商品销量比较
