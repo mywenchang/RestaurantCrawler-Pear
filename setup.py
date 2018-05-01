@@ -30,7 +30,6 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'pear_web = pear.web.app:main',
             'job_queue = pear.jobs.manager:main'
         ]
     }

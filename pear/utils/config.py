@@ -9,8 +9,8 @@ config = {
     'logging_formatter': '%(asctime)s [%(process)d] %(filename)s %(lineno)d %(levelname)s: %(message)s'
 }
 
+IS_DEBUG = bool(os.getenv('is_debug', False))
 MYSQL_CONFIG = config['mysql']
 BEANSTALK_CONFIG = config['beanstalk']
 LOGGING_FORMATTER = config['logging_formatter']
-IS_DEBUG = bool(os.getenv('is_debug', False))
 DOMAIN = '.youcute.cn'
