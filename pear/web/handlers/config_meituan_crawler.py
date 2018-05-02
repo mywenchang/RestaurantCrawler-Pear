@@ -22,3 +22,14 @@ def area_page():
     location = mt_crawler_controller.get_area_page(key, lat, lng)
     mt_crawler_controller.get_restaurants(location)
     return jsonify(location=location)
+
+"""
+3565863.78666
+11598884.3118
+
+marks[]: 30.656917,104.195018
+marks[]: 30.652963,104.188051
+marks[]: 30.653164,104.190516
+marks[]: 30.681403,104.153661
+marks[]: 30.993124,103.622414
+"""

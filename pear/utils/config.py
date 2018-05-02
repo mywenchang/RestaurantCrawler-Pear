@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 
 config = {
@@ -14,3 +15,5 @@ MYSQL_CONFIG = config['mysql']
 BEANSTALK_CONFIG = config['beanstalk']
 LOGGING_FORMATTER = config['logging_formatter']
 DOMAIN = '.youcute.cn'
+ELE_LOGIN_MAX_AGE = 60 * 30  # 饿了么登录成功的cookie超时时间，30分钟
+USER_LOGIN_MAX_AGE = 30 * 24 * 60 * 60  # 用户登录的cookie超时时间，一个月

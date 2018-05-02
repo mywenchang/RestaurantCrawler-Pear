@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify, session, Response
 
 from pear.models.user import UserDao
 from pear.web.utils.set_cookie import set_cookie
+from pear.utils.config import USER_LOGIN_MAX_AGE
 
 authorize_router = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -20,7 +21,7 @@ def login():
         return jsonify(status='false', message=u'密码错误'), 401
     session[user['id']] = user['name']
     resp = Response(json.dumps({'status': 'ok', 'user': user}), mimetype='application/json')
-    set_cookie(resp, 'u_id', str(user['id']))
+    set_cookie(resp, 'u_id', str(user['id']), max_age=USER_LOGIN_MAX_AGE)
     return resp
 
 

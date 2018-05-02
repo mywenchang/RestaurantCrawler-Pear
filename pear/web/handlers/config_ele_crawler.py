@@ -8,6 +8,7 @@ from pear.web.controllers.ele_crawler_controller import get_ele_msg_code, login_
     get_ele_city_list, search_ele_address, get_ele_restaurants
 from pear.web.utils.authorize import authorize
 from pear.web.utils.set_cookie import set_cookie
+from pear.utils.config import ELE_LOGIN_MAX_AGE
 
 config_ele_crawler_router = Blueprint('config_ele_crawler', __name__, url_prefix='/config_ele_crawler')
 
@@ -35,7 +36,7 @@ def get_sms_code():
     mobile = request.args.get('mobile')
     pic_code = request.args.get('pic_code', '')
     image_token = request.args.get('pic_token', '')
-    success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)    
+    success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
     return jsonify(success=success, ele_sms_token=ele_sms_token, message=msg)
 
 
@@ -56,7 +57,7 @@ def login_ele():
         resp = Response(data, mimetype='application/json')
         for i, v in cookies.iteritems():
             set_cookie(resp, i, v)
-        set_cookie(resp, 'ele_login_account', str(mobile))
+        set_cookie(resp, 'ele_login_account', str(mobile), max_age=ELE_LOGIN_MAX_AGE)
         return resp
     return jsonify(success=False, message=content)
 
