@@ -11,3 +11,4 @@ develop-eggs/
 nosetests.xml
 .vscode
 *.png
+log
