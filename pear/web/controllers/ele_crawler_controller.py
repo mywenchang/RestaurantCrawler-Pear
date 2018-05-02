@@ -54,6 +54,8 @@ def get_ele_captchas(mobile_phone):
             return data.get('captcha_image'), data.get('captcha_hash')
     except Exception as e:
         logger.error(e, exc_info=True)
+    finally:
+        return False, None
 
 
 def login_ele_by_mobile(mobile_phone, sms_code, sms_token):
@@ -96,7 +98,8 @@ def get_ele_city_list():
 @mem_cache()
 def search_ele_address(key, latitude, longitude):
     url = 'https://www.ele.me/restapi/v2/pois'
-    _geohash = geohash.encode(latitude=float(latitude), longitude=float(longitude))
+    _geohash = geohash.encode(latitude=float(
+        latitude), longitude=float(longitude))
     logger.info('geohash: {}'.format(_geohash))
     params = {
         'extras[]': 'count',

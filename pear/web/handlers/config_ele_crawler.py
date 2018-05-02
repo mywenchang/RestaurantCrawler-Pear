@@ -35,7 +35,7 @@ def get_sms_code():
     mobile = request.args.get('mobile')
     pic_code = request.args.get('pic_code', '')
     image_token = request.args.get('pic_token', '')
-    success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)
+    success, ele_sms_token, msg = get_ele_msg_code(mobile, pic_code, image_token)    
     return jsonify(success=success, ele_sms_token=ele_sms_token, message=msg)
 
 
