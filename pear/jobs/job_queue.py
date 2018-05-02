@@ -1,7 +1,6 @@
 # coding=utf-8
 
 import json
-from collections import defaultdict
 
 import beanstalkc
 import signal
@@ -47,7 +46,6 @@ class Putter(object):
             'tube': self.tube,
             'kwargs': kwargs
         }
-        logger.info('put job:{} to queue.Job length:{}'.format(self.func.__name__, len(args)))
         beanstalk = beanstalkc.Connection(host=BEANSTALK_CONFIG['host'], port=BEANSTALK_CONFIG['port'])
         try:
             beanstalk.use(self.tube)

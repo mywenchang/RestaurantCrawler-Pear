@@ -5,7 +5,7 @@ import requests
 from pear.crawlers import CRAWLER_TYPES, CRAWLERS
 from pear.jobs.job_queue import JobQueue
 from pear.models.restaurant import RestaurantDao
-from pear.utils.const import SOURCE
+from pear.utils.const import SOURCE, HOT_CITIES
 from pear.utils.logger import logger
 from pear.utils.mem_cache import mem_cache
 from geohash2 import geohash
@@ -86,7 +86,8 @@ def get_ele_city_list():
             data = resp.json()
             cities = []
             for k, v in data.iteritems():
-                cities.extend(data[k])
+                item = [i for i in data[k] if i['name'] in HOT_CITIES]
+                cities.extend(item)
             return cities
     except Exception as e:
         logger.error(e, exc_info=True)

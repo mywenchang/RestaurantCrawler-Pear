@@ -4,10 +4,10 @@ import json
 from flask import jsonify, Blueprint, request, Response
 
 from pear.models.user_log import UserLogDao
-from pear.web.utils.authorize import authorize
-from pear.web.utils.set_cookie import set_cookie
 from pear.web.controllers.ele_crawler_controller import get_ele_msg_code, login_ele_by_mobile, get_ele_captchas, \
     get_ele_city_list, search_ele_address, get_ele_restaurants
+from pear.web.utils.authorize import authorize
+from pear.web.utils.set_cookie import set_cookie
 
 config_ele_crawler_router = Blueprint('config_ele_crawler', __name__, url_prefix='/config_ele_crawler')
 
@@ -67,7 +67,7 @@ def login_ele():
 def fetch_ele_cites():
     cities = get_ele_city_list()
     if cities:
-        return jsonify(cities[:10])
+        return jsonify(cities)
     else:
         return jsonify([])
 
