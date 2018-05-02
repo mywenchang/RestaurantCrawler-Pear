@@ -92,3 +92,16 @@ CREATE TABLE `user_log` (
     PRIMARY KEY (`id`),
     KEY `idx_user_id` (`user_id`)
 ) ENGINE = InnoDB CHARSET = utf8;
+
+DROP TABLE IF EXISTS `analyse_task`;
+CREATE TABLE `analyse_task` (
+    `id` INT(11) UNSIGNED AUTO_INCREMENT,
+    `user_id` INT(11) NOT NULL COMMENT '用户 id ,对应 user 表中 id',
+    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `data` TEXT NOT NULL COMMENT '数据分析任务信息 JSON 序列化之后的字符串',
+    `type` INT(1) NOT NULL COMMENT '数据分析任务的类型',
+    `crawler_id_one` INT(11) NOT NULL COMMENT '爬虫id1',
+    `crawler_id_two` INT(11) COMMENT '爬虫id2',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE = InnoDB CHARSET = utf8;

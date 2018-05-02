@@ -27,7 +27,7 @@ class BaseDao(object):
         return data
 
     @classmethod
-    def get_list(cls, sql, page, per_page, count_sql=None):
+    def get_list(cls, sql, page=-1, per_page=10, count_sql=None):
         if page != -1:
             sql = sql.limit(per_page).offset((page - 1) * per_page)
         result_proxy = engine.connect().execute(sql)

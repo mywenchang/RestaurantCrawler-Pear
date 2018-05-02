@@ -15,7 +15,7 @@ def install_modules():
     from pear.web.handlers.authorize import authorize_router
     from pear.web.handlers.crawler_tasks import crawler_tasks_router
     from pear.web.handlers.config_meituan_crawler import config_mt_crawler_router
-    from pear.web.handlers.ele_data_analyse import data_router
+    from pear.web.handlers.data_analyse import data_router
     application.register_blueprint(user_router)
     application.register_blueprint(config_ele_crawler_router)
     application.register_blueprint(config_mt_crawler_router)

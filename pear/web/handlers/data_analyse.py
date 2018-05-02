@@ -1,26 +1,31 @@
 # coding=utf-8
+import json
+
 from flask import Blueprint, jsonify, url_for, request
 
+from pear.models.analyse_task import AnalyseTaskDao
 from pear.models.crawler import CrawlerDao
-from pear.models.dish import DishDao
 from pear.models.rate import RateDao
-from pear.models.restaurant import RestaurantDao
+from pear.models.user_log import UserLogDao
+from pear.utils.const import AnalyTaskType
 from pear.utils.split_words import generator_cloud
+from pear.web.controllers import analy_task_controller
+from pear.web.utils.authorize import authorize
 
 data_router = Blueprint('analyse', __name__, url_prefix='/analyse')
 
 
-# 获取店铺
-@data_router.route('/restaurant/<int:source>/<int:restaurant_id>')
-def get_restaurant(source, restaurant_id):
-    restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id, source=source)
-    return jsonify(restaurant)
-
-
-# 分布
+# 获取店铺数据分布
 @data_router.route('/dish_distribution/<int:crawler_id>')
+@authorize
 def sale_distribution(crawler_id):
-    dish, _ = DishDao.get_by_crawler_id(crawler_id, page=-1)
+    u_id = request.cookies.get('u_id')
+    data = AnalyseTaskDao.get_by_u_id(u_id, crawler_one=crawler_id, _type=AnalyTaskType.SINGLE)
+    if data:
+        return jsonify(data['data'])
+    UserLogDao.create(u_id, u'获取店铺商品数据分布')
+    crawler = CrawlerDao.get_by_id(crawler_id, u_id)
+    dishes = crawler['dishes']
 
     def render_item(k):
         return sorted([
@@ -29,7 +34,7 @@ def sale_distribution(crawler_id):
                 'food_name': item['name'],
                 'value': item[k]
             }
-            for item in dish],
+            for item in dishes],
             key=lambda d: d['value'],
             reverse=True)
 
@@ -39,7 +44,7 @@ def sale_distribution(crawler_id):
     rate_dis = render_item('rating')
     # 销量随价格的分布
     price_dis = {}
-    for item in dish:
+    for item in dishes:
         price = item['price']
         price_dis.setdefault(price, 0)
         sale = item['moth_sales']
@@ -53,17 +58,21 @@ def sale_distribution(crawler_id):
         rate_at = item['rated_at']
         rate_date_dis.setdefault(rate_at, 0)
         rate_date_dis[rate_at] += 1
-
-    return jsonify({
+    data = {
+        'restaurant': crawler['restaurant'],
         'sales_dis': sales,
         'rate_dis': rate_dis,
         'price_dis': price_dis,
         'rate_date_dis': rate_date_dis
-    })
+    }
+    analy_task_controller.save_analyse_data.put(u_id=u_id, data=json.dumps(data), crawler_one=crawler_id,
+                                                _type=AnalyTaskType.SINGLE)
+    return jsonify(data)
 
 
 # 词云
 @data_router.route('/rating_word_cloud/<int:crawler_id>')
+@authorize
 def rating_cloud(crawler_id):
     rate, _ = RateDao.get_by_crawler_id(crawler_id, page=-1)
     food_rates = {}
@@ -82,12 +91,18 @@ def rating_cloud(crawler_id):
 
 # 比较两家店
 @data_router.route('/compare/<int:crawler_one>/<int:crawler_two>')
+@authorize
 def compare(crawler_one, crawler_two):
     u_id = request.cookies.get('u_id')
+    data = AnalyseTaskDao.get_by_u_id(u_id, crawler_one=crawler_one, crawler_two=crawler_two, _type=AnalyTaskType.MULTI)
+    if data:
+        return jsonify(data['data'])
     crawler_1 = CrawlerDao.get_by_id(crawler_one, u_id)
     crawler_2 = CrawlerDao.get_by_id(crawler_two, u_id)
     if not crawler_1 or not crawler_2:
         return jsonify({'message': u'爬虫不存在'}), 401
+    UserLogDao.create(u_id, action_name=u'比较两家店',
+                      action_args=u'{} vs {}'.format(crawler_1['restaurant']['name'], crawler_2['restaurant']['name']))
     dish_1 = crawler_1['dishes']
     dish_2 = crawler_2['dishes']
     # 同价位商品销量比较
@@ -139,8 +154,7 @@ def compare(crawler_one, crawler_two):
 
     a_rate = sort_price(rate_compare_with_same_price['a'])
     b_rate = sort_price(rate_compare_with_same_price['b'])
-
-    return jsonify({
+    data = {
         'crawler_1': crawler_1,
         'crawler_2': crawler_2,
         'sales_compare_with_same_price': {
@@ -153,4 +167,19 @@ def compare(crawler_one, crawler_two):
             'b': b_rate
         },
         'other': []
+    }
+    analy_task_controller.save_analyse_data.put(u_id=u_id, data=json.dumps(data), crawler_one=crawler_one,
+                                                crawler_two=crawler_two, _type=AnalyTaskType.MULTI)
+    return jsonify(data)
+
+
+# 获取用户历史数据分析
+@data_router.route('/history')
+@data_router.route('/history/<int:analyse_type>')
+@authorize
+def history(analyse_type=None):
+    u_id = request.cookies.get('u_id')
+    data, _ = AnalyseTaskDao.batch_get_by_u_id(u_id, _type=analyse_type)
+    return jsonify({
+        'data': data
     })

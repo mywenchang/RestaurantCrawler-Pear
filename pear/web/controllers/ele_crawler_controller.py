@@ -10,8 +10,6 @@ from pear.utils.logger import logger
 from pear.utils.mem_cache import mem_cache
 from geohash2 import geohash
 
-queue = JobQueue()
-
 
 def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
     url = 'https://h5.ele.me/restapi/eus/login/mobile_send_code'
@@ -151,7 +149,7 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
         logger.error(e, exc_info=True)
 
 
-@queue.task('crawlers')
+@JobQueue.task('crawlers')
 def commit_crawler_task(source, cookies, args):
     crawler_str = "{}_crawler".format(source)
     match_crawler = CRAWLERS.get(crawler_str)
@@ -167,7 +165,7 @@ def commit_crawler_task(source, cookies, args):
     crawler.crawl()
 
 
-@queue.task('crawlers')
+@JobQueue.task('crawlers')
 def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
     restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id)
     if restaurant:

@@ -83,8 +83,8 @@ class CrawlEleDishes(BaseCrawler):
                     food_name = food.get('rate_name')
                     food_star = food.get('rating_star')
                     food_rate = food.get('rating_text')
-                    RateDao.create(self.id, rating_id, rating_star, rated_at, rating_text, time_spent_desc,
-                                   food_id, food_name, food_star, food_rate, self.restaurant_id)
+                    RateDao.create(self.id, rating_id, rating_star, rated_at, rating_text, time_spent_desc, food_id,
+                                   food_name, food_star, food_rate, self.restaurant_id)
             data_size = len(data)
             if data_size < 1:
                 return
@@ -110,8 +110,7 @@ class CrawlEleDishes(BaseCrawler):
                 rating_count = food_item.get('rating_count')
                 food_id = food_item.get('specfoods')[0].get('food_id')
                 price = food_item.get('specfoods')[0].get('price')
-                DishDao.create(food_id, restaurant_id, name,
-                               rating, month_sales, rating_count, price, self.id)
+                DishDao.create(food_id, restaurant_id, name, rating, month_sales, rating_count, price, self.id)
                 total += 1
                 self.update_count(total)
         try:

@@ -16,3 +16,8 @@ class Crawler_Status(object):
     Crawling = 0,
     DONE = 1,
     Error = 2
+
+
+class AnalyTaskType(object):
+    SINGLE = 1,
+    MULTI = 2
