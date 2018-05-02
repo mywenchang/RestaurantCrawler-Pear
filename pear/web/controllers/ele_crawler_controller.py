@@ -51,11 +51,12 @@ def get_ele_captchas(mobile_phone):
         resp = requests.post(url, json=payload, headers=headers, timeout=5)
         if resp.status_code == 200:
             data = resp.json()
-            return data.get('captcha_image'), data.get('captcha_hash')
+            return True, data.get('captcha_image'), data.get('captcha_hash')
+        logger.error(u'get_ele_pic_failed: {}'.format(resp.content))
     except Exception as e:
         logger.error(e, exc_info=True)
     finally:
-        return False, None
+        return False, None, None
 
 
 def login_ele_by_mobile(mobile_phone, sms_code, sms_token):

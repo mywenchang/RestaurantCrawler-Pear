@@ -24,8 +24,8 @@ config_ele_crawler_router = Blueprint('config_ele_crawler', __name__, url_prefix
 @authorize
 def get_pic_code():
     mobile = request.args.get('mobile')
-    ele_image_base64, ele_image_token = get_ele_captchas(mobile)
-    return jsonify(success=True, ele_image_base64=ele_image_base64, ele_image_token=ele_image_token)
+    success, ele_image_base64, ele_image_token = get_ele_captchas(mobile)
+    return jsonify(success=success, ele_image_base64=ele_image_base64, ele_image_token=ele_image_token)
 
 
 # 获取短信验证码
