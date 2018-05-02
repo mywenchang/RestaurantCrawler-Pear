@@ -67,7 +67,7 @@ def login_ele():
 def fetch_ele_cites():
     cities = get_ele_city_list()
     if cities:
-        return jsonify(cities)
+        return jsonify(cities[:10])
     else:
         return jsonify([])
 

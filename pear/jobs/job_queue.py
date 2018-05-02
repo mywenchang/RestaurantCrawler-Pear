@@ -47,7 +47,7 @@ class Putter(object):
             'tube': self.tube,
             'kwargs': kwargs
         }
-        logger.info('put job:{} to queue'.format(args))
+        logger.info('put job:{} to queue.Job length:{}'.format(self.func.__name__, len(args)))
         beanstalk = beanstalkc.Connection(host=BEANSTALK_CONFIG['host'], port=BEANSTALK_CONFIG['port'])
         try:
             beanstalk.use(self.tube)
@@ -104,9 +104,9 @@ class Worker(object):
                 self.on_job(job)
                 self.delete_job(job)
             except beanstalkc.CommandFailed as e:
-                logger.warning(e, exc_info=1)
+                logger.error(e, exc_info=True)
             except Exception as e:
-                logger.error(e)
+                logger.error(e, exc_info=True)
                 kicks = job.stats()['kicks']
                 if kicks < 3:
                     self.bury_job(job)
