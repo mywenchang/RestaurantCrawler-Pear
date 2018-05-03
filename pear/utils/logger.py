@@ -13,4 +13,4 @@ if not IS_DEBUG:
     logger_handler.setFormatter(formatter)
     logger.addHandler(logger_handler)
 
-coloredlogs.install(level='DEBUG' if IS_DEBUG else 'ERROR', logger=logger, fmt=LOGGING_FORMATTER)
+coloredlogs.install(level='INFO', logger=logger, fmt=LOGGING_FORMATTER)

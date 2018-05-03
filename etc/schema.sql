@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `restaurant`;
 CREATE TABLE `restaurant` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
-	`restaurant_id` INT(11) UNSIGNED COMMENT '商家id，来自数据源',
+	`restaurant_id` INT(20) UNSIGNED COMMENT '商家id，来自数据源',
 	`name` VARCHAR(100) DEFAULT NULL COMMENT '商家名称',
 	`source` TINYINT(1) COMMENT '数据来源',
 	`sales` INT(11) UNSIGNED COMMENT '销量',
@@ -17,7 +17,7 @@ CREATE TABLE `restaurant` (
 
 DROP TABLE IF EXISTS `dish`;
 CREATE TABLE `dish` (
-	`id` INT(11) UNSIGNED AUTO_INCREMENT,
+	`id` INT(20) UNSIGNED AUTO_INCREMENT,
 	`food_id` INT(11) UNSIGNED COMMENT '菜品id',
 	`restaurant_id` INT(11) UNSIGNED COMMENT 'restaurant 表中的 id',
 	`name` VARCHAR(100)  DEFAULT NULL COMMENT '菜品名称',
@@ -64,7 +64,7 @@ CREATE TABLE `user` (
 
 DROP TABLE IF EXISTS `rate`;
 CREATE TABLE `rate` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `rating_id` int(10) DEFAULT NULL,
   `rating_start` int(1) DEFAULT NULL,
   `rated_at` varchar(50) DEFAULT NULL,

@@ -26,11 +26,14 @@ setup(
         'wordcloud',
         'Pillow',
         'numpy',
-        'matplotlib'
+        'matplotlib',
+        'beautifulsoup4',
+        'html5lib'
     ],
     entry_points={
         'console_scripts': [
-            'job_queue = pear.jobs.manager:main'
+            'job_queue = pear.jobs.manager:main',
+            'web = pear.web.app:main'
         ]
     }
 )

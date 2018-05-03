@@ -15,8 +15,10 @@ user_router = Blueprint('user', __name__, url_prefix='/user')
 @authorize
 def get_user_info():
     u_id = request.cookies.get('u_id')
-    UserDao.add_visitor_count(u_id)
     user = UserDao.get_by_id(u_id)
+    if not user:
+        return jsonify(), 401
+    UserDao.add_visitor_count(u_id)
     return jsonify(user)
 
 

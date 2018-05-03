@@ -7,6 +7,6 @@ CRAWLERS = dict({
 })
 
 CRAWLER_TYPES = dict({
-    1: 'ele_crawler',
-    2: 'meituan_crawler'
+    'ele_crawler': 1,
+    'meituan_crawler': 2
 })

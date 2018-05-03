@@ -70,8 +70,7 @@ class Worker(object):
         self.signal_shutdown = False
         signal.signal(signal.SIGTERM, lambda signum, frame: self.graceful_shutdown())
         Worker.worker_id += 1
-        import_module_by_str('pear.web.controllers.ele_crawler_controller')
-        import_module_by_str('pear.web.controllers.mt_crawler_controller')
+        import_module_by_str('pear.web.controllers.comm')
         import_module_by_str('pear.web.controllers.analy_task_controller')
 
     def subscribe(self):

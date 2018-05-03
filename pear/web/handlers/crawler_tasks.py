@@ -5,9 +5,9 @@ from flask import jsonify, Blueprint, request
 from pear.models.crawler import CrawlerDao
 from pear.models.dish import DishDao
 from pear.models.rate import RateDao
-from pear.web.utils.authorize import authorize
 from pear.utils.logger import logger
-from pear.web.controllers.ele_crawler_controller import commit_crawler_task
+from pear.web.utils.authorize import authorize
+from pear.web.controllers.comm import create_crawler_funcs
 
 crawler_tasks_router = Blueprint('tasks_router', __name__, url_prefix='/crawler_tasks')
 
@@ -57,28 +57,8 @@ def get_crawler_status(crawler_id):
 def create_crawler():
     source = request.args.get('source')
     if source not in ['ele', 'meituan']:
-        return jsonify(succcess=False)
-    try:
-        cookies = request.cookies
-        data_list = request.json
-        for data in data_list:
-            latitude = data.get('latitude')
-            longitude = data.get('longitude')
-            if not data.get('restaurant') or not latitude or not longitude:
-                return jsonify(success=False), 404
-            args = {
-                'restaurant': {
-                    'id': data.get('restaurant').get('id'),
-                    'latitude': data.get('restaurant').get('latitude'),
-                    'longitude': data.get('restaurant').get('longitude'),
-                },
-                'latitude': latitude,
-                'longitude': longitude
-            }
-            commit_crawler_task.put(source=source, cookies=cookies, args=args)
-    except Exception as e:
-        return jsonify(success=False, message=e.message.__str__()), 500
-    return jsonify(success=True), 200
+        return jsonify(succcess=False, message=u'不支持的来源:{}'.format(source)), 400
+    return create_crawler_funcs[source](request)
 
 
 @crawler_tasks_router.route('/<int:crawler_id>', methods=['DELETE'])

@@ -1,14 +1,12 @@
 # coding=utf-8
 
 import requests
+from geohash2 import geohash
 
-from pear.crawlers import CRAWLER_TYPES, CRAWLERS
-from pear.jobs.job_queue import JobQueue
-from pear.models.restaurant import RestaurantDao
 from pear.utils.const import SOURCE, HOT_CITIES
 from pear.utils.logger import logger
 from pear.utils.mem_cache import mem_cache
-from geohash2 import geohash
+from pear.web.controllers.comm import save_ele_restaurants
 
 
 def get_ele_msg_code(mobile_phone, captcha_value='', captch_hash=''):
@@ -152,31 +150,3 @@ def get_ele_restaurants(geohash, latitude, longitude, cookies, offset=0, limit=2
             return data
     except Exception as e:
         logger.error(e, exc_info=True)
-
-
-@JobQueue.task('crawlers')
-def commit_crawler_task(source, cookies, args):
-    crawler_str = "{}_crawler".format(source)
-    match_crawler = CRAWLERS.get(crawler_str)
-    if not match_crawler:
-        logger.error('{} NOT MATCH!'.format(crawler_str))
-        return
-    crawler_type = 0
-    for k, v in CRAWLER_TYPES.iteritems():
-        if v == crawler_str:
-            crawler_type = k
-            break
-    crawler = match_crawler(crawler_type, cookies, args)
-    crawler.crawl()
-
-
-@JobQueue.task('crawlers')
-def save_ele_restaurants(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
-    restaurant = RestaurantDao.get_by_restaurant_id(restaurant_id)
-    if restaurant:
-        RestaurantDao.update_by_restaurant_id(restaurant_id, name=name, source=source, sales=sales,
-                                              arrive_time=arrive_time, send_fee=send_fee, score=score,
-                                              latitude=latitude, longitude=longitude, image=image)
-    else:
-        RestaurantDao.create(restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude,
-                             image)

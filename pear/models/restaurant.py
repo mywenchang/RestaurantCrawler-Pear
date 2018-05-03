@@ -8,7 +8,8 @@ from pear.models.tables import restaurant
 class RestaurantDao(BaseDao):
 
     @classmethod
-    def create(cls, restaurant_id, name, source, sales, arrive_time, send_fee, score, latitude, longitude, image):
+    def create(cls, restaurant_id, name, source, sales=0, arrive_time=0, send_fee=0, score=0, latitude=None,
+               longitude=None, image=None):
         sql = restaurant.insert().values(
             restaurant_id=restaurant_id,
             name=name,
@@ -39,11 +40,20 @@ class RestaurantDao(BaseDao):
             sales=sales,
             arrive_time=arrive_time,
             send_fee=send_fee,
-            score=score,
-            latitude=latitude,
-            longitude=longitude,
-            image=image
+            score=score
         )
+        if longitude is not None:
+            sql = sql.values(
+                longitude=longitude
+            )
+        if latitude is not None:
+            sql = sql.values(
+                latitude=latitude
+            )
+        if image is not None:
+            sql = sql.values(
+                image=image
+            )
         return cls.update(sql)
 
     @classmethod

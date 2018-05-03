@@ -50,3 +50,7 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'DELETE, PATCH, POST, PUT,GET, OPTIONS')
 
     return response
+
+
+def main():
+    application.run(host='0.0.0.0', port=7777, debug=True)
