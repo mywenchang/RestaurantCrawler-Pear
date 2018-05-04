@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS `restaurant`;
 CREATE TABLE `restaurant` (
 	`id` INT(11) UNSIGNED AUTO_INCREMENT,
-	`restaurant_id` INT(20) UNSIGNED COMMENT '商家id，来自数据源',
+	`restaurant_id` BIGINT(20) UNSIGNED COMMENT '商家id，来自数据源',
 	`name` VARCHAR(100) DEFAULT NULL COMMENT '商家名称',
 	`source` TINYINT(1) COMMENT '数据来源',
 	`sales` INT(11) UNSIGNED COMMENT '销量',
