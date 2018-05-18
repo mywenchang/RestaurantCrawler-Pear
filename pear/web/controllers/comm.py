@@ -50,11 +50,6 @@ def __create_ele(request):
         return jsonify(success=False, message=e.message.__str__()), 500
 
 
-def __create_meituan(request):
-    pass
-
-
 create_crawler_funcs = {
-    'ele': __create_ele,
-    'meituan': __create_meituan
+    'ele': __create_ele
 }
