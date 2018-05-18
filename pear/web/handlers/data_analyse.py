@@ -49,7 +49,9 @@ def sale_distribution(crawler_id):
         price_dis.setdefault(price, 0)
         sale = item['moth_sales']
         price_dis[price] += sale
-    price_dis = sorted([{'name': k, 'value': v} for k, v in price_dis.items()], key=lambda d: d['name'])
+    price_dis = sorted(
+        [{'name': k, 'value': v} for k, v in price_dis.items()],
+        key=lambda d: d['name'])
 
     # 店铺评论数随时间分布
     rate, _ = RateDao.get_by_crawler_id(crawler_id, page=-1)
