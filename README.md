@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/jiyangg/Pear.svg?branch=master)](https://travis-ci.org/jiyangg/Pear)
 
+[前端展示 http://spider.youcute.cn](http://spider.youcute.cn)
+
 # 项目结构
 |模块名|文件目录|说明|
 |:---:|:---:|:---:|
@@ -26,7 +28,8 @@
 - [x] 饿了么商家爬虫
 - [x] 饿了么商家菜品爬虫
 - [x] 饿了么商家评论爬虫
-- [ ] 饿了么数据分析
+- [x] 饿了么数据分析
+- [ ] 美团外卖数据爬取
 
 
 # Api
