@@ -2,7 +2,7 @@
 import json
 
 from datetime import datetime
-from sqlalchemy import update, select, and_, func
+from sqlalchemy import select
 
 from pear.models.base import BaseDao
 from pear.models.tables import analyse_task_table as table
@@ -63,13 +63,22 @@ class AnalyseTaskDao(BaseDao):
     def wrap_item(cls, item):
         if not item:
             return None
-        logger.info("{} {}".format(item.id, item.data))
+
+        def load_data():
+            try:
+                data = json.loads(item.data)
+            except Exception as e:
+                logger.error(e)
+                return None
+            else:
+                return data
+
         return {
             'id': item.id,
             'key': item.id,
             'user_id': item.user_id,
             'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
-            'data': json.loads(item.data),
+            'data': load_data(),
             'crawler_one': item.crawler_id_one,
             'crawler_two': item.crawler_id_two,
             'type': item.type
