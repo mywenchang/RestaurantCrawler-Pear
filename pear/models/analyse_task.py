@@ -66,19 +66,22 @@ class AnalyseTaskDao(BaseDao):
 
         def load_data():
             try:
-                data = json.loads(item.data)
+                _data = json.loads(item.data)
             except Exception as e:
                 logger.error(e)
                 return None
             else:
-                return data
+                return _data
 
+        data = load_data()
+        if not data:
+            return None
         return {
             'id': item.id,
             'key': item.id,
             'user_id': item.user_id,
             'created': item.created.strftime('%Y-%m-%d %H:%M:%S'),
-            'data': load_data(),
+            'data': data,
             'crawler_one': item.crawler_id_one,
             'crawler_two': item.crawler_id_two,
             'type': item.type
