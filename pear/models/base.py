@@ -32,6 +32,7 @@ class BaseDao(object):
             sql = sql.limit(per_page).offset((page - 1) * per_page)
         result_proxy = engine.connect().execute(sql)
         result = [cls.wrap_item(item) for item in result_proxy.fetchall()]
+        result = filter(lambda r_item: r_item is not None, result)
         result_proxy.close()
         count = 0
         if count_sql is not None:
