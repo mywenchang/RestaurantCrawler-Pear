@@ -6,6 +6,7 @@ from sqlalchemy import update, select, and_, func
 
 from pear.models.base import BaseDao
 from pear.models.tables import analyse_task_table as table
+from pear.utils.logger import logger
 
 
 class AnalyseTaskDao(BaseDao):
@@ -62,6 +63,7 @@ class AnalyseTaskDao(BaseDao):
     def wrap_item(cls, item):
         if not item:
             return None
+        logger.info("{} {}".format(item.id, item.data))
         return {
             'id': item.id,
             'key': item.id,
