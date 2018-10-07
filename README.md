@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/jiyangg/Pear.svg?branch=master)](https://travis-ci.org/jiyangg/Pear)
-
-[前端展示 http://spider.youcute.cn](http://spider.youcute.cn)
+> 爬取外卖平台商家数据，生成可对比的视图
 
 # 项目结构
 |模块名|文件目录|说明|
