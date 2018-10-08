@@ -1,12 +1,23 @@
 > 爬取外卖平台商家数据，生成可对比的视图 [基于 React 的前端请转](https://github.com/stefanJi/pear-web)
 
 # 项目结构
+
+![](http://7xu0oh.com2.z0.glb.qiniucdn.com/18-10-9/32638624.jpg)
+
 |模块名|文件目录|说明|
 |:---:|:---:|:---:|
 |http服务|web|包含API接口具体实现，基于 Flask Web框架|
 |爬虫实现|crawlers|爬虫的具体实现|
 |爬虫任务执行|jobs|基于消息队列(beanstalkd)的任务调度|
 |数据操作|models|对数据库的 CRUD 操作实现, 基于 Sqlalchemy |
+
+# 爬虫设计
+
+![](http://7xu0oh.com2.z0.glb.qiniucdn.com/18-10-9/31686846.jpg)
+
+# 数据库
+
+![](http://7xu0oh.com2.z0.glb.qiniucdn.com/18-10-9/9548846.jpg)
 
 # HTTP 方法说明
 
@@ -27,7 +38,8 @@
 - [x] 饿了么商家菜品爬虫
 - [x] 饿了么商家评论爬虫
 - [x] 饿了么数据分析
-- [ ] 美团外卖数据爬取
+- [x] 美团外卖数据爬取
+- [ ] 百度外卖爬取
 
 
 # Api
@@ -47,3 +59,7 @@
 - 获取所有爬虫任务 `crawler/task` GET
 - 获取单条爬虫任务 `crawler/task/<int:crawler_id>` GET
 - 删除任务 `crawler/task/<int:crawler_id>` DELETE
+
+# 评论词云
+
+![](http://7xu0oh.com2.z0.glb.qiniucdn.com/18-10-9/13896243.jpg)
